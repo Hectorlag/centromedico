@@ -5,9 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b1558cfe-4d85-40bb-99ee-c2ff1b8e4c48" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/centromedico/sistema_turnos/model/BaseEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/centromedico/sistema_turnos/model/Consultorio.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/centromedico/sistema_turnos/model/Especialidad.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/centromedico/sistema_turnos/model/Medico.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/centromedico/sistema_turnos/model/Paciente.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/centromedico/sistema_turnos/model/Turno.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/centromedico/sistema_turnos/SistemaTurnosApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/centromedico/sistema_turnos/SistemaTurnosApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,6 +45,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.SistemaTurnosApplication.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "master",

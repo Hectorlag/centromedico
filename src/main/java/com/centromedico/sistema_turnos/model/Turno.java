@@ -36,4 +36,29 @@ public class Turno {
     @JoinColumn(name = "paciente_id")
     private Paciente paciente;
 
+    // ✅ OK - Solo cambia datos, sin lógica compleja
+    public void cambiarEstadoALlamado() {
+        this.estado = "LLAMADO";
+        this.horaLlamado = LocalDateTime.now();
+    }
+
+    public void cambiarEstadoAAtendiendo() {
+        this.estado = "ATENDIENDO";
+        this.horaInicioAtencion = LocalDateTime.now();
+    }
+
+    // ✅ OK - Query simple sobre datos propios
+    public boolean estaEsperando() {
+        return "ESPERANDO".equals(estado);
+    }
+
+    // Agregar a la clase Turno
+    public void cambiarEstadoAFinalizado() {
+        this.estado = "FINALIZADO";
+    }
+
+    public void cambiarEstadoACancelado() {
+        this.estado = "CANCELADO";
+    }
+
 }

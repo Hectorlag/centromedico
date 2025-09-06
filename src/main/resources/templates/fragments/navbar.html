@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<nav th:fragment="navbar" class="main-header navbar navbar-expand navbar-white navbar-light">
+
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <!-- Sidebar toggle button -->
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+                <i class="fas fa-bars"></i>
+            </a>
+        </li>
+
+        <!-- Logo and Title -->
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/turnos/dashboard" class="nav-link">
+                <i class="fas fa-hospital-alt text-primary"></i>
+                <strong class="ml-1">Centro Médico</strong>
+            </a>
+        </li>
+
+        <!-- Quick Navigation -->
+        <li class="nav-item d-none d-md-inline-block">
+            <a href="/turnos/dashboard" class="nav-link">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+
+        <li class="nav-item d-none d-md-inline-block">
+            <a href="/turnos" class="nav-link">
+                <i class="fas fa-calendar-check"></i> Turnos
+            </a>
+        </li>
+
+        <li class="nav-item d-none d-lg-inline-block">
+            <a href="/turnos/esperando" class="nav-link">
+                <i class="fas fa-clock text-warning"></i> En Espera
+                <span th:if="${turnosEnEsperaCount != null && turnosEnEsperaCount > 0}"
+                      class="badge badge-warning ml-1" th:text="${turnosEnEsperaCount}">0</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Center search -->
+    <ul class="navbar-nav ml-auto mr-auto d-none d-lg-flex">
+        <li class="nav-item">
+            <form class="form-inline" method="get" action="/pacientes/buscar">
+                <div class="input-group input-group-sm">
+                    <input class="form-control form-control-navbar"
+                           type="search"
+                           name="q"
+                           placeholder="Buscar paciente (DNI o nombre)"
+                           aria-label="Buscar paciente"
+                           th:value="${param.q}">
+                    <div class="input-group-append">
+                        <button class="btn btn-navbar" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </li>
+    </ul>
+
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+
+        <!-- Notifications Dropdown -->
+        <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#" role="button">
+                <i class="far fa-bell"></i>
+                <span th:if="${notificacionesCount != null && notificacionesCount > 0}"
+                      class="badge badge-warning navbar-badge" th:text="${notificacionesCount}">3</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-item dropdown-header">
+                    <span th:text="${notificacionesCount ?: 0}">3</span> Notificaciones
+                </span>
+
+                <div class="dropdown-divider"></div>
+
+                <!-- Notification: Turnos atrasados -->
+                <a href="/turnos/atrasados" class="dropdown-item">
+                    <i class="fas fa-exclamation-triangle text-warning mr-2"></i>
+                    <span th:text="${turnosAtrasadosCount ?: 0}">2</span> turnos atrasados
+                    <span class="float-right text-muted text-sm">hace 5 min</span>
+                </a>
+
+                <div class="dropdown-divider"></div>
+
+                <!-- Notification: Pacientes sin atender -->
+                <a href="/turnos/esperando" class="dropdown-item">
+                    <i class="fas fa-user-clock text-info mr-2"></i>
+                    <span th:text="${pacientesSinAtenderCount ?: 0}">1</span> paciente esperando
+                    <span class="float-right text-muted text-sm">hace 10 min</span>
+                </a>
+
+                <div class="dropdown-divider"></div>
+
+                <!-- Ver todas las notificaciones -->
+                <a href="/notificaciones" class="dropdown-item dropdown-footer">
+                    Ver todas las notificaciones
+                </a>
+            </div>
+        </li>
+
+        <!-- Quick Actions Dropdown -->
+        <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#" role="button">
+                <i class="fas fa-plus-circle"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="/turnos/create">
+                    <i class="fas fa-calendar-plus text-primary mr-2"></i>
+                    Nuevo Turno
+                </a>
+                <a class="dropdown-item" href="/pacientes/create">
+                    <i class="fas fa-user-plus text-success mr-2"></i>
+                    Nuevo Paciente
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/consultorios">
+                    <i class="fas fa-door-open text-info mr-2"></i>
+                    Gestionar Consultorios
+                </a>
+                <a class="dropdown-item" href="/especialidades">
+                    <i class="fas fa-stethoscope text-warning mr-2"></i>
+                    Gestionar Especialidades
+                </a>
+            </div>
+        </li>
+
+        <!-- User Account Dropdown -->
+        <li class="nav-item dropdown user-menu">
+            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                <img src="/images/avatars/user-default.png"
+                     class="user-image img-circle elevation-2"
+                     alt="User Image"
+                     th:src="${session.user?.avatar ?: '/images/avatars/user-default.png'}">
+                <span class="d-none d-md-inline"
+                      th:text="${session.user?.nombre ?: 'Usuario'}">Dr. Juan Pérez</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <!-- User image -->
+                <li class="user-header bg-primary">
+                    <img class="img-circle elevation-2"
+                         src="/images/avatars/user-default.png"
+                         alt="User Avatar"
+                         th:src="${session.user?.avatar ?: '/images/avatars/user-default.png'}">
+                    <p>
+                        <span th:text="${session.user?.nombre ?: 'Usuario'}">Dr. Juan Pérez</span> -
+                        <span th:text="${session.user?.rol ?: 'Secretario'}">Médico Cardiólogo</span>
+                        <small>
+                            Miembro desde
+                            <span th:text="${session.user?.fechaRegistro != null ? #temporals.format(session.user.fechaRegistro, 'MMM yyyy') : 'ene 2024'}">ene 2024</span>
+                        </small>
+                    </p>
+                </li>
+
+                <!-- Menu Body -->
+                <li class="user-body">
+                    <div class="row">
+                        <div class="col-4 text-center">
+                            <a href="/mi-agenda" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-calendar"></i><br>
+                                Mi Agenda
+                            </a>
+                        </div>
+                        <div class="col-4 text-center">
+                            <a href="/mis-pacientes" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-users"></i><br>
+                                Pacientes
+                            </a>
+                        </div>
+                        <div class="col-4 text-center">
+                            <a href="/estadisticas" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-chart-bar"></i><br>
+                                Estadísticas
+                            </a>
+                        </div>
+                    </div>
+                </li>
+
+                <!-- Menu Footer-->
+                <li class="user-footer">
+                    <a href="/perfil" class="btn btn-default btn-flat">
+                        <i class="fas fa-user-cog"></i> Perfil
+                    </a>
+                    <a href="/logout" class="btn btn-default btn-flat float-right">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Control Sidebar Toggle -->
+        <li class="nav-item">
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                <i class="fas fa-cog"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+</html>

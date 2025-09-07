@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 @AllArgsConstructor
@@ -22,8 +24,8 @@ public class Turno extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime fecha;
-    private LocalDateTime horaProgramada;
+    private LocalDate fecha;  // Solo fecha, sin hora
+    private LocalTime horaProgramada;  // Solo hora, sin fecha
     private LocalDateTime horaLlamado;
     private LocalDateTime horaInicioAtencion;
     private String estado;

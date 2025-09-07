@@ -24,6 +24,7 @@ public class Paciente extends BaseEntity{
     private String apellido;
     private String telefono;
     private String email;
+    private String obraSocial;
 
     @OneToMany(mappedBy = "paciente")
     private Set<Turno> turnos;

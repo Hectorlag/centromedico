@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<footer th:fragment="footer" class="main-footer">
+
+    <!-- Left side -->
+    <div class="float-left d-none d-sm-block">
+        <strong>Copyright &copy; 2024-2025 <a href="/" class="text-primary">Centro Médico</a>.</strong>
+        Todos los derechos reservados.
+    </div>
+
+    <!-- Right side -->
+    <div class="float-right">
+        <b>Versión</b> 1.0.0
+    </div>
+
+    <!-- Mobile version (full width) -->
+    <div class="d-block d-sm-none text-center">
+        <strong>&copy; 2024-2025 Centro Médico</strong><br>
+        <small class="text-muted">v1.0.0 | Sistema de Gestión de Turnos</small>
+    </div>
+
+    <!-- Additional footer info for larger screens -->
+    <div class="mt-2 d-none d-lg-block">
+        <div class="row text-center text-muted">
+            <div class="col-md-3">
+                <small>
+                    <i class="fas fa-shield-alt text-success mr-1"></i>
+                    Datos protegidos con SSL
+                </small>
+            </div>
+            <div class="col-md-3">
+                <small>
+                    <i class="fas fa-clock mr-1"></i>
+                    Última actualización:
+                    <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy HH:mm')}">07/01/2025 14:30</span>
+                </small>
+            </div>
+            <div class="col-md-3">
+                <small>
+                    <i class="fas fa-users mr-1"></i>
+                    <span th:text="${usuariosConectados != null ? usuariosConectados : 0}">0</span> usuarios conectados
+                </small>
+            </div>
+            <div class="col-md-3">
+                <small>
+                    <a href="/ayuda" class="text-muted">
+                        <i class="fas fa-question-circle mr-1"></i>
+                        Ayuda
+                    </a>
+                    |
+                    <a href="/contacto" class="text-muted">
+                        <i class="fas fa-envelope mr-1"></i>
+                        Contacto
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+
+</footer>
+</html>

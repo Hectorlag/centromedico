@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "medicos")
 @Entity
+@Table(name = "turnos")
 public class Turno extends BaseEntity {
 
 

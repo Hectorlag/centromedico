@@ -19,6 +19,7 @@ import java.util.Set;
 @Table(name = "consultorios")
 public class Consultorio extends BaseEntity {
 
+    private String numero;
     private String nombre;
     private String piso;
     private String descripcion;

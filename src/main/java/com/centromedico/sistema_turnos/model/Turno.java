@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @Table(name = "medicos")
 @Entity
-public class Turno {
+public class Turno extends BaseEntity {
 
 
     @Id

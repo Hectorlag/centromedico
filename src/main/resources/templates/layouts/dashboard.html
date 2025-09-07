@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<!-- Page Title -->
+<div layout:fragment="page-title">
+    <i class="fas fa-tachometer-alt mr-2"></i>Dashboard de Turnos
+    <small class="text-muted ml-2" th:text="${#temporals.format(fecha, 'EEEE, dd \'de\' MMMM \'de\' yyyy', #locale)}">
+        Lunes, 07 de enero de 2025
+    </small>
+</div>
+
+<!-- Breadcrumb -->
+<div layout:fragment="breadcrumb">
+    <li class="breadcrumb-item"><a href="/turnos/dashboard">Inicio</a></li>
+    <li class="breadcrumb-item active">Dashboard</li>
+</div>
+
+<!-- Main Content -->
+<div layout:fragment="content">
+
+    <!-- Stats Cards Row -->
+    <div class="row">
+        <!-- Total Turnos -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3 th:text="${totalTurnos ?: 0}">15</h3>
+                    <p>Turnos del Día</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <a href="/turnos" class="small-box-footer">
+                    Ver todos <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Turnos En Espera -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3 th:text="${turnosEnEspera ?: 0}">5</h3>
+                    <p>En Espera</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <a href="/turnos/esperando" class="small-box-footer">
+                    Gestionar <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Turnos Atendiendo -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3 th:text="${turnosAtendiendo ?: 0}">3</h3>
+                    <p>Atendiendo</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <a href="/turnos/estado/ATENDIENDO" class="small-box-footer">
+                    Ver detalles <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Turnos Finalizados -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-secondary">
+                <div class="inner">
+                    <h3 th:text="${turnosFinalizados ?: 0}">7</h3>
+                    <p>Finalizados</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <a href="/turnos/estadisticas" class="small-box-footer">
+                    Estadísticas <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Row -->
+    <div class="row">
+
+        <!-- Turnos En Espera -->
+        <div class="col-md-6">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-clock mr-2"></i>Turnos en Espera
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" onclick="location.reload()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div th:if="${listaTurnosEspera != null and not #lists.isEmpty(listaTurnosEspera)}">
+                        <div th:each="turno, iterStat : ${listaTurnosEspera}"
+                             class="d-flex justify-content-between align-items-center border-bottom py-2"
+                             th:classappend="${iterStat.index >= 5 ? 'd-none turno-extra' : ''}">
+
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3">
+                                    <span class="badge badge-warning badge-lg">
+                                        <i class="fas fa-clock"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <strong th:text="${turno.paciente?.nombre ?: 'Paciente sin nombre'}">
+                                        María González
+                                    </strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user-md mr-1"></i>
+                                        <span th:text="${turno.medico?.nombre ?: 'Médico no asignado'}">Dr. Smith</span>
+                                        |
+                                        <i class="fas fa-clock mr-1"></i>
+                                        <span th:text="${turno.horaProgramada != null ? #temporals.format(turno.horaProgramada, 'HH:mm') : 'Sin hora'}">
+                                            14:30
+                                        </span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="btn-group btn-group-sm">
+                                <form th:action="@{'/turnos/' + ${turno.id} + '/llamar'}" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-info btn-sm" title="Llamar Paciente">
+                                        <i class="fas fa-phone"></i>
+                                    </button>
+                                </form>
+                                <a th:href="@{'/turnos/' + ${turno.id}}" class="btn btn-secondary btn-sm" title="Ver Detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Show more button if there are more than 5 -->
+                        <div th:if="${#lists.size(listaTurnosEspera) > 5}" class="text-center mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleTurnosExtra()">
+                                <span id="toggle-text">Ver más</span>
+                                (<span th:text="${#lists.size(listaTurnosEspera) - 5}">3</span> más)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div th:if="${listaTurnosEspera == null or #lists.isEmpty(listaTurnosEspera)}"
+                         class="text-center text-muted py-4">
+                        <i class="fas fa-check-circle fa-3x mb-3"></i>
+                        <h5>¡No hay turnos en espera!</h5>
+                        <p>Todos los pacientes han sido atendidos.</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/turnos/esperando" class="btn btn-primary btn-block">
+                        <i class="fas fa-list mr-2"></i>Ver Todos los Turnos en Espera
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Turnos Atendiendo -->
+        <div class="col-md-6">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-md mr-2"></i>Atendiendo Ahora
+                    </h3>
+                    <div class="card-tools">
+                        <span class="badge badge-success" th:text="${#lists.size(listaTurnosAtendiendo)}">2</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div th:if="${listaTurnosAtendiendo != null and not #lists.isEmpty(listaTurnosAtendiendo)}">
+                        <div th:each="turno : ${listaTurnosAtendiendo}"
+                             class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3">
+                                    <span class="badge badge-success badge-lg">
+                                        <i class="fas fa-stethoscope"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <strong th:text="${turno.paciente?.nombre ?: 'Paciente sin nombre'}">
+                                        Carlos Rodríguez
+                                    </strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user-md mr-1"></i>
+                                        <span th:text="${turno.medico?.nombre ?: 'Médico no asignado'}">Dr. López</span>
+                                        |
+                                        <i class="fas fa-door-open mr-1"></i>
+                                        <span th:text="${turno.consultorio?.nombre ?: 'Consultorio no asignado'}">Consultorio 2</span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="btn-group btn-group-sm">
+                                <form th:action="@{'/turnos/' + ${turno.id} + '/finalizar'}" method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm" title="Finalizar Atención">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <a th:href="@{'/turnos/' + ${turno.id}}" class="btn btn-secondary btn-sm" title="Ver Detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${listaTurnosAtendiendo == null or #lists.isEmpty(listaTurnosAtendiendo)}"
+                         class="text-center text-muted py-4">
+                        <i class="fas fa-coffee fa-3x mb-3"></i>
+                        <h5>No hay consultas en curso</h5>
+                        <p>Todos los médicos están disponibles.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Row -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-info">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-bolt mr-2"></i>Acciones Rápidas
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 col-6">
+                            <a href="/turnos/create" class="btn btn-success btn-block btn-lg">
+                                <i class="fas fa-calendar-plus mr-2"></i>
+                                Nuevo Turno
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="/pacientes/create" class="btn btn-primary btn-block btn-lg">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                Nuevo Paciente
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="/turnos/calendario" class="btn btn-warning btn-block btn-lg">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                Ver Calendario
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="/reportes/turnos" class="btn btn-info btn-block btn-lg">
+                                <i class="fas fa-chart-bar mr-2"></i>
+                                Reportes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Summary -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-secondary">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-pie mr-2"></i>Resumen del Día
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-2 col-6">
+                            <div class="description-block border-right">
+                                <span class="description-percentage text-success">
+                                    <i class="fas fa-caret-up"></i>
+                                    <span th:text="${totalTurnos > 0 ? #numbers.formatPercent((turnosFinalizados ?: 0) / totalTurnos, 0, 0) : '0%'}">70%</span>
+                                </span>
+                                <h5 class="description-header" th:text="${turnosFinalizados ?: 0}">7</h5>
+                                <span class="description-text">FINALIZADOS</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-6">
+                            <div class="description-block border-right">
+                                <span class="description-percentage text-warning">
+                                    <i class="fas fa-caret-up"></i>
+                                    <span th:text="${totalTurnos > 0 ? #numbers.formatPercent((turnosEnEspera ?: 0) / totalTurnos, 0, 0) : '0%'}">30%</span>
+                                </span>
+                                <h5 class="description-header" th:text="${turnosEnEspera ?: 0}">5</h5>
+                                <span class="description-text">EN ESPERA</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-6">
+                            <div class="description-block border-right">
+                                <span class="description-percentage text-info">
+                                    <i class="fas fa-caret-up"></i>
+                                    <span th:text="${totalTurnos > 0 ? #numbers.formatPercent((turnosAtendiendo ?: 0) / totalTurnos, 0, 0) : '0%'}">20%</span>
+                                </span>
+                                <h5 class="description-header" th:text="${turnosAtendiendo ?: 0}">3</h5>
+                                <span class="description-text">ATENDIENDO</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-6">
+                            <div class="description-block border-right">
+                                <span class="description-percentage text-muted">
+                                    <span th:text="${#temporals.format(#temporals.createNow(), 'HH:mm')}">14:25</span>
+                                </span>
+                                <h5 class="description-header">AHORA</h5>
+                                <span class="description-text">HORA ACTUAL</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-6">
+                            <div class="description-block border-right">
+                                <span class="description-percentage text-primary">
+                                    <i class="fas fa-calendar"></i>
+                                </span>
+                                <h5 class="description-header" th:text="${#temporals.format(fecha, 'dd')}">07</h5>
+                                <span class="description-text" th:text="${#temporals.format(fecha, 'MMM yyyy').toUpperCase()}">ENE 2025</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-6">
+                            <div class="description-block">
+                                <span class="description-percentage text-success">
+                                    <i class="fas fa-check-circle"></i>
+                                </span>
+                                <h5 class="description-header">100%</h5>
+                                <span class="description-text">OPERATIVO</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Page-specific JavaScript -->
+<div layout:fragment="scripts">
+    <script>
+        function toggleTurnosExtra() {
+            const extraTurnos = document.querySelectorAll('.turno-extra');
+            const toggleText = document.getElementById('toggle-text');
+            const isHidden = extraTurnos[0].classList.contains('d-none');
+
+            extraTurnos.forEach(turno => {
+                if (isHidden) {
+                    turno.classList.remove('d-none');
+                } else {
+                    turno.classList.add('d-none');
+                }
+            });
+
+            toggleText.textContent = isHidden ? 'Ver menos' : 'Ver más';
+        }
+
+        // Auto-refresh dashboard every 30 seconds
+        setInterval(function() {
+            if (document.visibilityState === 'visible') {
+                // Only reload the stats, not the whole page
+                location.reload();
+            }
+        }, 30000);
+
+        // Add confirmation for critical actions
+        document.addEventListener('DOMContentLoaded', function() {
+            const finalizeButtons = document.querySelectorAll('button[title="Finalizar Atención"]');
+            finalizeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (!confirm('¿Está seguro que desea finalizar esta atención?')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+</div>
+
+</html>

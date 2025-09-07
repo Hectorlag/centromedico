@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<aside th:fragment="sidebar" class="main-sidebar sidebar-dark-primary elevation-4">
+
+    <!-- Brand Logo -->
+    <a href="/turnos/dashboard" class="brand-link">
+        <img src="/images/logos/logo-small.png"
+             alt="Centro Médico Logo"
+             class="brand-image img-circle elevation-3"
+             style="opacity: .8">
+        <span class="brand-text font-weight-light">Centro Médico</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+        <!-- Sidebar user panel -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="/images/avatars/user-default.png"
+                     class="img-circle elevation-2"
+                     alt="User Image"
+                     th:src="${session.user?.avatar ?: '/images/avatars/user-default.png'}">
+            </div>
+            <div class="info">
+                <a href="/perfil" class="d-block"
+                   th:text="${session.user?.nombre ?: 'Usuario'}">Dr. Juan Pérez</a>
+            </div>
+        </div>
+
+        <!-- Sidebar Search Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar"
+                       type="search"
+                       placeholder="Buscar en menú"
+                       aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+                <!-- Dashboard -->
+                <li class="nav-item">
+                    <a href="/turnos/dashboard"
+                       class="nav-link"
+                       th:classappend="${#request.requestURI == '/turnos/dashboard' ? 'active' : ''}">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+
+                <!-- Gestión de Turnos -->
+                <li class="nav-item"
+                    th:classappend="${#strings.startsWith(#request.requestURI, '/turnos') ? 'menu-open' : ''}">
+                    <a href="#" class="nav-link"
+                       th:classappend="${#strings.startsWith(#request.requestURI, '/turnos') ? 'active' : ''}">
+                        <i class="nav-icon fas fa-calendar-check"></i>
+                        <p>
+                            Gestión de Turnos
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/turnos"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/turnos' ? 'active' : ''}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Todos los Turnos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/turnos/esperando"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/turnos/esperando' ? 'active' : ''}">
+                                <i class="far fa-clock nav-icon text-warning"></i>
+                                <p>
+                                    En Espera
+                                    <span th:if="${turnosEnEsperaCount != null && turnosEnEsperaCount > 0}"
+                                          class="badge badge-warning right" th:text="${turnosEnEsperaCount}">3</span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/turnos/create"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/turnos/create' ? 'active' : ''}">
+                                <i class="far fa-plus-square nav-icon text-success"></i>
+                                <p>Nuevo Turno</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/turnos/calendario"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/turnos/calendario' ? 'active' : ''}">
+                                <i class="far fa-calendar-alt nav-icon"></i>
+                                <p>Vista Calendario</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/turnos/estadisticas"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/turnos/estadisticas' ? 'active' : ''}">
+                                <i class="far fa-chart-bar nav-icon"></i>
+                                <p>Estadísticas</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Pacientes -->
+                <li class="nav-item"
+                    th:classappend="${#strings.startsWith(#request.requestURI, '/pacientes') ? 'menu-open' : ''}">
+                    <a href="#" class="nav-link"
+                       th:classappend="${#strings.startsWith(#request.requestURI, '/pacientes') ? 'active' : ''}">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>
+                            Pacientes
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/pacientes"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/pacientes' ? 'active' : ''}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Lista de Pacientes</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/pacientes/create"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/pacientes/create' ? 'active' : ''}">
+                                <i class="far fa-user-plus nav-icon text-success"></i>
+                                <p>Nuevo Paciente</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/pacientes/buscar"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/pacientes/buscar' ? 'active' : ''}">
+                                <i class="far fa-search nav-icon"></i>
+                                <p>Buscar Paciente</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Médicos -->
+                <li class="nav-item"
+                    th:classappend="${#strings.startsWith(#request.requestURI, '/medicos') ? 'menu-open' : ''}">
+                    <a href="#" class="nav-link"
+                       th:classappend="${#strings.startsWith(#request.requestURI, '/medicos') ? 'active' : ''}">
+                        <i class="nav-icon fas fa-user-md"></i>
+                        <p>
+                            Médicos
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/medicos"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/medicos' ? 'active' : ''}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Lista de Médicos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/medicos/agenda"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/medicos/agenda' ? 'active' : ''}">
+                                <i class="far fa-calendar nav-icon"></i>
+                                <p>Agenda Médicos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/medicos/horarios"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/medicos/horarios' ? 'active' : ''}">
+                                <i class="far fa-clock nav-icon"></i>
+                                <p>Horarios</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Administración -->
+                <li class="nav-header">ADMINISTRACIÓN</li>
+
+                <!-- Consultorios -->
+                <li class="nav-item">
+                    <a href="/consultorios"
+                       class="nav-link"
+                       th:classappend="${#strings.startsWith(#request.requestURI, '/consultorios') ? 'active' : ''}">
+                        <i class="nav-icon fas fa-door-open"></i>
+                        <p>Consultorios</p>
+                    </a>
+                </li>
+
+                <!-- Especialidades -->
+                <li class="nav-item">
+                    <a href="/especialidades"
+                       class="nav-link"
+                       th:classappend="${#strings.startsWith(#request.requestURI, '/especialidades') ? 'active' : ''}">
+                        <i class="nav-icon fas fa-stethoscope"></i>
+                        <p>Especialidades</p>
+                    </a>
+                </li>
+
+                <!-- Reportes -->
+                <li class="nav-item"
+                    th:classappend="${#strings.startsWith(#request.requestURI, '/reportes') ? 'menu-open' : ''}">
+                    <a href="#" class="nav-link"
+                       th:classappend="${#strings.startsWith(#request.requestURI, '/reportes') ? 'active' : ''}">
+                        <i class="nav-icon fas fa-chart-line"></i>
+                        <p>
+                            Reportes
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/reportes/turnos"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/reportes/turnos' ? 'active' : ''}">
+                                <i class="far fa-chart-bar nav-icon"></i>
+                                <p>Reporte de Turnos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/reportes/medicos"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/reportes/medicos' ? 'active' : ''}">
+                                <i class="far fa-chart-pie nav-icon"></i>
+                                <p>Rendimiento Médicos</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/reportes/especialidades"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/reportes/especialidades' ? 'active' : ''}">
+                                <i class="far fa-chart-area nav-icon"></i>
+                                <p>Por Especialidad</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Configuración -->
+                <li class="nav-header">SISTEMA</li>
+
+                <li class="nav-item"
+                    th:classappend="${#strings.startsWith(#request.requestURI, '/configuracion') ? 'menu-open' : ''}">
+                    <a href="#" class="nav-link"
+                       th:classappend="${#strings.startsWith(#request.requestURI, '/configuracion') ? 'active' : ''}">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>
+                            Configuración
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/configuracion/centro"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/configuracion/centro' ? 'active' : ''}">
+                                <i class="far fa-hospital nav-icon"></i>
+                                <p>Datos del Centro</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/configuracion/usuarios"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/configuracion/usuarios' ? 'active' : ''}">
+                                <i class="far fa-users-cog nav-icon"></i>
+                                <p>Usuarios</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/configuracion/backup"
+                               class="nav-link"
+                               th:classappend="${#request.requestURI == '/configuracion/backup' ? 'active' : ''}">
+                                <i class="far fa-database nav-icon"></i>
+                                <p>Respaldos</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Ayuda -->
+                <li class="nav-item">
+                    <a href="/ayuda"
+                       class="nav-link"
+                       th:classappend="${#request.requestURI == '/ayuda' ? 'active' : ''}">
+                        <i class="nav-icon fas fa-question-circle"></i>
+                        <p>Ayuda</p>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+</aside>
+</html>

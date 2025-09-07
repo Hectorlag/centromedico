@@ -30,7 +30,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     // Pacientes con turnos para fecha específica
     @Query("SELECT DISTINCT p FROM Paciente p JOIN p.turnos t WHERE p.activo = true AND t.fecha = :fecha AND t.activo = true")
     List<Paciente> findPacientesConTurnosPorFecha(@Param("fecha") LocalDate fecha);
-    
+
 
     // Últimos pacientes registrados
     List<Paciente> findTop10ByActivoTrueOrderByCreatedAtDesc();

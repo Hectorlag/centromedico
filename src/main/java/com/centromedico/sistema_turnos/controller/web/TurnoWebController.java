@@ -22,21 +22,16 @@ public class TurnoWebController {
     private final TurnoService turnoService;
 
     // ==================== PÁGINAS PRINCIPALES ====================
-
-    /**
-     * Dashboard principal - Vista para secretarias
-     */
+    
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         LocalDate hoy = LocalDate.now();
 
-        // Solo delegamos al service, sin lógica
         List<Turno> turnosHoy = turnoService.obtenerTurnosDelDia(hoy);
         List<Turno> turnosEnEspera = turnoService.obtenerTurnosEnEspera(hoy);
         List<Turno> turnosAtendiendo = turnoService.obtenerTurnosPorEstado("ATENDIENDO", hoy);
         List<Turno> turnosFinalizados = turnoService.obtenerTurnosPorEstado("FINALIZADO", hoy);
 
-        // Solo preparamos el model para la vista
         model.addAttribute("fecha", hoy);
         model.addAttribute("totalTurnos", turnosHoy.size());
         model.addAttribute("turnosEnEspera", turnosEnEspera.size());
@@ -46,7 +41,7 @@ public class TurnoWebController {
         model.addAttribute("listaTurnosAtendiendo", turnosAtendiendo);
 
         log.debug("Dashboard cargado para fecha: {}", hoy);
-        return "turnos/dashboard";
+        return "pages/turnos/dashboard-simple";
     }
 
     /**

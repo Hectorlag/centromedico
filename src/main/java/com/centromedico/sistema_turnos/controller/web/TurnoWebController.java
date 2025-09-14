@@ -53,7 +53,7 @@ public class TurnoWebController {
 
         log.debug("Dashboard cargado para fecha: {}", hoy);
 
-        return "pages/turnos/dashboard";
+        return "dashboard";
     }
     /**
      * Lista completa de turnos por fecha

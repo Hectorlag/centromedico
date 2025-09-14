@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @Controller
@@ -22,17 +24,26 @@ public class TurnoWebController {
     private final TurnoService turnoService;
 
     // ==================== PÁGINAS PRINCIPALES ====================
-    
+
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {
+    public String dashboard(Model model, Locale locale) {
+
+        // Obtener fecha actual
         LocalDate hoy = LocalDate.now();
 
+        // Formatear fecha para mostrar en español
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM 'de' yyyy", locale);
+        String fechaFormateada = hoy.format(formatter);
+
+        // Tu lógica existente...
         List<Turno> turnosHoy = turnoService.obtenerTurnosDelDia(hoy);
         List<Turno> turnosEnEspera = turnoService.obtenerTurnosEnEspera(hoy);
         List<Turno> turnosAtendiendo = turnoService.obtenerTurnosPorEstado("ATENDIENDO", hoy);
         List<Turno> turnosFinalizados = turnoService.obtenerTurnosPorEstado("FINALIZADO", hoy);
 
+        // Agregar atributos al modelo
         model.addAttribute("fecha", hoy);
+        model.addAttribute("fechaFormateada", fechaFormateada); // Nueva línea
         model.addAttribute("totalTurnos", turnosHoy.size());
         model.addAttribute("turnosEnEspera", turnosEnEspera.size());
         model.addAttribute("turnosAtendiendo", turnosAtendiendo.size());
@@ -41,9 +52,9 @@ public class TurnoWebController {
         model.addAttribute("listaTurnosAtendiendo", turnosAtendiendo);
 
         log.debug("Dashboard cargado para fecha: {}", hoy);
-        return "pages/turnos/dashboard-simple";
-    }
 
+        return "pages/turnos/dashboard";
+    }
     /**
      * Lista completa de turnos por fecha
      */

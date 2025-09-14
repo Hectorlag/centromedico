@@ -4,10 +4,7 @@
 
     <!-- Brand Logo -->
     <a href="/turnos/dashboard" class="brand-link">
-        <img src="/images/logos/logo-small.png"
-             alt="Centro Médico Logo"
-             class="brand-image img-circle elevation-3"
-             style="opacity: .8">
+        <i class="fas fa-clinic-medical brand-image img-circle elevation-3" style="opacity: .8; font-size: 1.5rem; color: white;"></i>
         <span class="brand-text font-weight-light">Centro Médico</span>
     </a>
 
@@ -17,10 +14,7 @@
         <!-- Sidebar user panel -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <img src="/images/avatars/user-default.png"
-                     class="img-circle elevation-2"
-                     alt="User Image"
-                     th:src="${session.user?.avatar ?: '/images/avatars/user-default.png'}">
+                <i class="fas fa-user-circle img-circle elevation-2" style="font-size: 2rem; color: #adb5bd;"></i>
             </div>
             <div class="info">
                 <a href="/perfil" class="d-block"
@@ -51,7 +45,7 @@
                 <li class="nav-item">
                     <a href="/turnos/dashboard"
                        class="nav-link"
-                       th:classappend="${#request.requestURI == '/turnos/dashboard' ? 'active' : ''}">
+                       th:classappend="${#httpServletRequest.requestURI == '/turnos/dashboard' ? 'active' : ''}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>
@@ -59,9 +53,9 @@
 
                 <!-- Gestión de Turnos -->
                 <li class="nav-item"
-                    th:classappend="${#strings.startsWith(#request.requestURI, '/turnos') ? 'menu-open' : ''}">
+                    th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/turnos') ? 'menu-open' : ''}">
                     <a href="#" class="nav-link"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/turnos') ? 'active' : ''}">
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/turnos') ? 'active' : ''}">
                         <i class="nav-icon fas fa-calendar-check"></i>
                         <p>
                             Gestión de Turnos
@@ -72,7 +66,7 @@
                         <li class="nav-item">
                             <a href="/turnos"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/turnos' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/turnos' ? 'active' : ''}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Todos los Turnos</p>
                             </a>
@@ -80,7 +74,7 @@
                         <li class="nav-item">
                             <a href="/turnos/esperando"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/turnos/esperando' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/turnos/esperando' ? 'active' : ''}">
                                 <i class="far fa-clock nav-icon text-warning"></i>
                                 <p>
                                     En Espera
@@ -92,7 +86,7 @@
                         <li class="nav-item">
                             <a href="/turnos/create"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/turnos/create' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/turnos/create' ? 'active' : ''}">
                                 <i class="far fa-plus-square nav-icon text-success"></i>
                                 <p>Nuevo Turno</p>
                             </a>
@@ -100,7 +94,7 @@
                         <li class="nav-item">
                             <a href="/turnos/calendario"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/turnos/calendario' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/turnos/calendario' ? 'active' : ''}">
                                 <i class="far fa-calendar-alt nav-icon"></i>
                                 <p>Vista Calendario</p>
                             </a>
@@ -108,7 +102,7 @@
                         <li class="nav-item">
                             <a href="/turnos/estadisticas"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/turnos/estadisticas' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/turnos/estadisticas' ? 'active' : ''}">
                                 <i class="far fa-chart-bar nav-icon"></i>
                                 <p>Estadísticas</p>
                             </a>
@@ -118,9 +112,9 @@
 
                 <!-- Pacientes -->
                 <li class="nav-item"
-                    th:classappend="${#strings.startsWith(#request.requestURI, '/pacientes') ? 'menu-open' : ''}">
+                    th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/pacientes') ? 'menu-open' : ''}">
                     <a href="#" class="nav-link"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/pacientes') ? 'active' : ''}">
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/pacientes') ? 'active' : ''}">
                         <i class="nav-icon fas fa-users"></i>
                         <p>
                             Pacientes
@@ -131,7 +125,7 @@
                         <li class="nav-item">
                             <a href="/pacientes"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/pacientes' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/pacientes' ? 'active' : ''}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Lista de Pacientes</p>
                             </a>
@@ -139,7 +133,7 @@
                         <li class="nav-item">
                             <a href="/pacientes/create"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/pacientes/create' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/pacientes/create' ? 'active' : ''}">
                                 <i class="far fa-user-plus nav-icon text-success"></i>
                                 <p>Nuevo Paciente</p>
                             </a>
@@ -147,7 +141,7 @@
                         <li class="nav-item">
                             <a href="/pacientes/buscar"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/pacientes/buscar' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/pacientes/buscar' ? 'active' : ''}">
                                 <i class="far fa-search nav-icon"></i>
                                 <p>Buscar Paciente</p>
                             </a>
@@ -157,9 +151,9 @@
 
                 <!-- Médicos -->
                 <li class="nav-item"
-                    th:classappend="${#strings.startsWith(#request.requestURI, '/medicos') ? 'menu-open' : ''}">
+                    th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/medicos') ? 'menu-open' : ''}">
                     <a href="#" class="nav-link"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/medicos') ? 'active' : ''}">
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/medicos') ? 'active' : ''}">
                         <i class="nav-icon fas fa-user-md"></i>
                         <p>
                             Médicos
@@ -170,7 +164,7 @@
                         <li class="nav-item">
                             <a href="/medicos"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/medicos' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/medicos' ? 'active' : ''}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Lista de Médicos</p>
                             </a>
@@ -178,7 +172,7 @@
                         <li class="nav-item">
                             <a href="/medicos/agenda"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/medicos/agenda' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/medicos/agenda' ? 'active' : ''}">
                                 <i class="far fa-calendar nav-icon"></i>
                                 <p>Agenda Médicos</p>
                             </a>
@@ -186,7 +180,7 @@
                         <li class="nav-item">
                             <a href="/medicos/horarios"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/medicos/horarios' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/medicos/horarios' ? 'active' : ''}">
                                 <i class="far fa-clock nav-icon"></i>
                                 <p>Horarios</p>
                             </a>
@@ -201,7 +195,7 @@
                 <li class="nav-item">
                     <a href="/consultorios"
                        class="nav-link"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/consultorios') ? 'active' : ''}">
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/consultorios') ? 'active' : ''}">
                         <i class="nav-icon fas fa-door-open"></i>
                         <p>Consultorios</p>
                     </a>
@@ -211,7 +205,7 @@
                 <li class="nav-item">
                     <a href="/especialidades"
                        class="nav-link"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/especialidades') ? 'active' : ''}">
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/especialidades') ? 'active' : ''}">
                         <i class="nav-icon fas fa-stethoscope"></i>
                         <p>Especialidades</p>
                     </a>
@@ -219,9 +213,9 @@
 
                 <!-- Reportes -->
                 <li class="nav-item"
-                    th:classappend="${#strings.startsWith(#request.requestURI, '/reportes') ? 'menu-open' : ''}">
+                    th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/reportes') ? 'menu-open' : ''}">
                     <a href="#" class="nav-link"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/reportes') ? 'active' : ''}">
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/reportes') ? 'active' : ''}">
                         <i class="nav-icon fas fa-chart-line"></i>
                         <p>
                             Reportes
@@ -232,7 +226,7 @@
                         <li class="nav-item">
                             <a href="/reportes/turnos"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/reportes/turnos' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/reportes/turnos' ? 'active' : ''}">
                                 <i class="far fa-chart-bar nav-icon"></i>
                                 <p>Reporte de Turnos</p>
                             </a>
@@ -240,7 +234,7 @@
                         <li class="nav-item">
                             <a href="/reportes/medicos"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/reportes/medicos' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/reportes/medicos' ? 'active' : ''}">
                                 <i class="far fa-chart-pie nav-icon"></i>
                                 <p>Rendimiento Médicos</p>
                             </a>
@@ -248,7 +242,7 @@
                         <li class="nav-item">
                             <a href="/reportes/especialidades"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/reportes/especialidades' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/reportes/especialidades' ? 'active' : ''}">
                                 <i class="far fa-chart-area nav-icon"></i>
                                 <p>Por Especialidad</p>
                             </a>
@@ -260,9 +254,9 @@
                 <li class="nav-header">SISTEMA</li>
 
                 <li class="nav-item"
-                    th:classappend="${#strings.startsWith(#request.requestURI, '/configuracion') ? 'menu-open' : ''}">
+                    th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/configuracion') ? 'menu-open' : ''}">
                     <a href="#" class="nav-link"
-                       th:classappend="${#strings.startsWith(#request.requestURI, '/configuracion') ? 'active' : ''}">
+                       th:classappend="${#strings.startsWith(#httpServletRequest.requestURI, '/configuracion') ? 'active' : ''}">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>
                             Configuración
@@ -273,7 +267,7 @@
                         <li class="nav-item">
                             <a href="/configuracion/centro"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/configuracion/centro' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/configuracion/centro' ? 'active' : ''}">
                                 <i class="far fa-hospital nav-icon"></i>
                                 <p>Datos del Centro</p>
                             </a>
@@ -281,7 +275,7 @@
                         <li class="nav-item">
                             <a href="/configuracion/usuarios"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/configuracion/usuarios' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/configuracion/usuarios' ? 'active' : ''}">
                                 <i class="far fa-users-cog nav-icon"></i>
                                 <p>Usuarios</p>
                             </a>
@@ -289,7 +283,7 @@
                         <li class="nav-item">
                             <a href="/configuracion/backup"
                                class="nav-link"
-                               th:classappend="${#request.requestURI == '/configuracion/backup' ? 'active' : ''}">
+                               th:classappend="${#httpServletRequest.requestURI == '/configuracion/backup' ? 'active' : ''}">
                                 <i class="far fa-database nav-icon"></i>
                                 <p>Respaldos</p>
                             </a>
@@ -301,7 +295,7 @@
                 <li class="nav-item">
                     <a href="/ayuda"
                        class="nav-link"
-                       th:classappend="${#request.requestURI == '/ayuda' ? 'active' : ''}">
+                       th:classappend="${#httpServletRequest.requestURI == '/ayuda' ? 'active' : ''}">
                         <i class="nav-icon fas fa-question-circle"></i>
                         <p>Ayuda</p>
                     </a>

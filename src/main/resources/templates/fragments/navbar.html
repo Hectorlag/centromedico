@@ -133,20 +133,14 @@
         <!-- User Account Dropdown -->
         <li class="nav-item dropdown user-menu">
             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                <img src="/images/avatars/user-default.png"
-                     class="user-image img-circle elevation-2"
-                     alt="User Image"
-                     th:src="${session.user?.avatar ?: '/images/avatars/user-default.png'}">
-                <span class="d-none d-md-inline"
+                <i class="fas fa-user-circle" style="font-size: 1.5rem; color: #6c757d;"></i>
+                <span class="d-none d-md-inline ml-1"
                       th:text="${session.user?.nombre ?: 'Usuario'}">Dr. Juan Pérez</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <!-- User image -->
+                <!-- User header -->
                 <li class="user-header bg-primary">
-                    <img class="img-circle elevation-2"
-                         src="/images/avatars/user-default.png"
-                         alt="User Avatar"
-                         th:src="${session.user?.avatar ?: '/images/avatars/user-default.png'}">
+                    <i class="fas fa-user-circle" style="font-size: 4rem; color: rgba(255,255,255,0.8);"></i>
                     <p>
                         <span th:text="${session.user?.nombre ?: 'Usuario'}">Dr. Juan Pérez</span> -
                         <span th:text="${session.user?.rol ?: 'Secretario'}">Médico Cardiólogo</span>

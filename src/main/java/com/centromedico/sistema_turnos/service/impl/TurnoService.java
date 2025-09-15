@@ -1,7 +1,10 @@
 package com.centromedico.sistema_turnos.service.impl;
 
+import com.centromedico.sistema_turnos.dtos.CrearTurnoDto;
 import com.centromedico.sistema_turnos.exception.BadRequestException;
 import com.centromedico.sistema_turnos.exception.ResourceNotFoundException;
+import com.centromedico.sistema_turnos.model.Medico;
+import com.centromedico.sistema_turnos.model.Paciente;
 import com.centromedico.sistema_turnos.model.Turno;
 import com.centromedico.sistema_turnos.repository.TurnoRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,27 @@ public class TurnoService implements com.centromedico.sistema_turnos.service.int
     @Autowired
     public TurnoService(TurnoRepository turnoRepository) {
         this.turnoRepository = turnoRepository;
+    }
+
+    @Override
+    public Turno crearTurno(CrearTurnoDto crearTurnoDto) {
+        // Crear el turno directamente sin validaciones
+        Turno nuevoTurno = new Turno();
+        nuevoTurno.setFecha(crearTurnoDto.getFecha());
+        nuevoTurno.setHoraProgramada(crearTurnoDto.getHoraProgramada());
+        nuevoTurno.setEstado("ESPERANDO");
+        nuevoTurno.setActivo(true);
+
+        // Crear objetos Medico y Paciente solo con ID
+        Medico medico = new Medico();
+        medico.setId(crearTurnoDto.getMedicoId());
+        nuevoTurno.setMedico(medico);
+
+        Paciente paciente = new Paciente();
+        paciente.setId(crearTurnoDto.getPacienteId());
+        nuevoTurno.setPaciente(paciente);
+
+        return turnoRepository.save(nuevoTurno);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.centromedico.sistema_turnos.service.interfaces;
 
+import com.centromedico.sistema_turnos.dtos.CrearTurnoDto;
 import com.centromedico.sistema_turnos.model.Turno;
 
 import java.time.LocalDate;
@@ -7,6 +8,7 @@ import java.util.List;
 
 public interface TurnoService {
 
+    Turno crearTurno(CrearTurnoDto crearTurnoDto);
     void llamarPaciente(Long turnoId);
     void iniciarAtencion(Long turnoId);
     void finalizarAtencion(Long turnoId);

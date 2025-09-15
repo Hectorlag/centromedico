@@ -4,11 +4,15 @@ import com.centromedico.sistema_turnos.model.Turno;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface TurnoRepository extends JpaRepository<Turno, Long> {
 
+    //Crear turno
+    List<Turno> findByMedicoIdAndFechaAndHoraProgramadaAndActivoTrue(
+            Long medicoId, LocalDate fecha, LocalTime horaProgramada);
 
     List<Turno> findByFechaAndActivoTrueOrderByHoraProgramadaAsc(LocalDate fecha);
     List<Turno> findByMedicoIdAndFechaAndActivoTrue(Long medicoId, LocalDate fecha);

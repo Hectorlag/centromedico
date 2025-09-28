@@ -1,5 +1,6 @@
 package com.centromedico.sistema_turnos.repository;
 
+import com.centromedico.sistema_turnos.dtos.PacienteDTO;
 import com.centromedico.sistema_turnos.model.Paciente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +20,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     boolean existsByIdAndActivoTrue(Long id);
 
     // Buscar por DNI (útil para validaciones)
-    Optional<Paciente> findByDni(String dni);
+    Optional<PacienteDTO> findByDni(String dni);
 
     boolean existsByDni(String dni);
 }

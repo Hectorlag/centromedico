@@ -19,7 +19,7 @@ public class MedicoMapper {
         dto.setDni(medico.getDni());
         dto.setMatricula(medico.getMatricula());
         dto.setTelefono(medico.getTelefono());
-        dto.setActivo(true); // Hardcodeado
+        dto.setActivo(true); // Hardeado
 
         // Campos opcionales con null-check
         if (medico.getEspecialidad() != null) {

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Lista de Pacientes</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 text-primary">
+                <i class="fas fa-users me-2"></i>
+                <span th:text="${titulo}">Lista de Pacientes</span>
+            </h1>
+        </div>
+    </div>
+
+    <!-- Mensajes Flash -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Botón Nuevo Paciente -->
+    <div class="row mb-3">
+        <div class="col d-flex justify-content-end">
+            <a th:href="@{/pacientes/nuevo}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Nuevo Paciente
+            </a>
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" th:action="@{/pacientes}" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="dni" class="form-label">DNI</label>
+                            <input type="text" class="form-control" id="dni" name="dni"
+                                   placeholder="Buscar por DNI" th:value="${param.dni}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="apellido" name="apellido"
+                                   placeholder="Buscar por apellido" th:value="${param.apellido}">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                            <a th:href="@{/pacientes}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de pacientes -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-table me-2"></i>
+                Pacientes
+                <span class="badge bg-light text-dark ms-2" th:text="${#lists.size(pacientes)}">0</span>
+            </h5>
+        </div>
+        <div class="card-body p-0">
+
+            <!-- Mensaje cuando no hay pacientes -->
+            <div th:if="${#lists.isEmpty(pacientes)}" class="text-center py-5">
+                <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No se encontraron pacientes</h5>
+                <p class="text-muted">Intenta ajustar los filtros de búsqueda o
+                    <a th:href="@{/pacientes/nuevo}" class="text-decoration-none">crear un nuevo paciente</a>
+                </p>
+            </div>
+
+            <!-- Tabla -->
+            <div th:unless="${#lists.isEmpty(pacientes)}" class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre Completo</th>
+                        <th>DNI</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Obra Social</th>
+                        <th width="200">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="paciente : ${pacientes}">
+                        <td>
+                            <span class="badge bg-secondary" th:text="${paciente.id}">1</span>
+                        </td>
+                        <td>
+                            <strong th:text="${paciente.apellido + ', ' + paciente.nombre}">
+                                Apellido, Nombre
+                            </strong>
+                        </td>
+                        <td>
+                            <code th:text="${paciente.dni}">12345678</code>
+                        </td>
+                        <td>
+                            <span th:if="${paciente.email}" th:text="${paciente.email}">email@ejemplo.com</span>
+                            <span th:unless="${paciente.email}" class="text-muted">-</span>
+                        </td>
+                        <td>
+                            <span th:if="${paciente.telefono}" th:text="${paciente.telefono}">123456789</span>
+                            <span th:unless="${paciente.telefono}" class="text-muted">-</span>
+                        </td>
+                        <td>
+                            <span th:if="${paciente.obraSocial}" th:text="${paciente.obraSocial}">OSDE</span>
+                            <span th:unless="${paciente.obraSocial}" class="text-muted">-</span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a th:href="@{/pacientes/{id}(id=${paciente.id})}"
+                                   class="btn btn-outline-info"
+                                   title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a th:href="@{/pacientes/{id}/editar(id=${paciente.id})}"
+                                   class="btn btn-outline-warning"
+                                   title="Editar paciente">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-outline-danger"
+                                        title="Eliminar paciente"
+                                        onclick="confirmarEliminacion(this)"
+                                        th:data-id="${paciente.id}"
+                                        th:data-nombre="${paciente.nombre + ' ' + paciente.apellido}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="row mt-3">
+        <div class="col">
+            <small class="text-muted">
+                <i class="fas fa-info-circle"></i>
+                Mostrando <strong th:text="${#lists.size(pacientes)}">0</strong> pacientes activos.
+            </small>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar al paciente <strong id="nombrePaciente"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Esta acción realizará una eliminación lógica (el paciente quedará inactivo).
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <form id="formEliminar" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    function confirmarEliminacion(boton) {
+        const id = boton.getAttribute('data-id');
+        const nombre = boton.getAttribute('data-nombre');
+
+        document.getElementById('nombrePaciente').textContent = nombre;
+        document.getElementById('formEliminar').action = '/pacientes/' + id + '/eliminar';
+
+        const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+        modal.show();
+    }
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+</script>
+</body>
+</html>

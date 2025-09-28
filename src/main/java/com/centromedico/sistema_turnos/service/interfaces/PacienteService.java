@@ -13,7 +13,8 @@ public interface PacienteService {
 
     // Lo que necesitas para Turnos (por ID)
     boolean existeYEstaActivo(Long id);
-    Paciente obtenerPorId(Long id); // Para crear turnos
+    Paciente obtenerPorId(Long id);// Para crear turnos
+    Optional<PacienteDTO> obtenerPorDni(String dni);
 
     // ============== MÉTODOS CRUD ADICIONALES ==============
 

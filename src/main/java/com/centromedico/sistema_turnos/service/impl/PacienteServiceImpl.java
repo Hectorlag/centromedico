@@ -54,6 +54,11 @@ public class PacienteServiceImpl implements PacienteService {
                 .orElseThrow(() -> new RuntimeException("Paciente no encontrado con ID: " + id));
     }
 
+    @Override
+    public Optional<PacienteDTO> obtenerPorDni(String dni) {
+        return pacienteRepository.findByDni(dni);
+    }
+
     // ============== MÉTODOS CRUD ADICIONALES ==============
 
     public PacienteDTO crear(PacienteDTO pacienteDTO) {

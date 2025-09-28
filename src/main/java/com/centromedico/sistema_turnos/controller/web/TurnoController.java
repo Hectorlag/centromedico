@@ -29,9 +29,6 @@ public class TurnoController {
         // Debug: verificar que el método se ejecuta
         log.info("=== ACCEDIENDO AL DASHBOARD ===");
 
-        // Puedes agregar datos al modelo si necesitas mostrar algo en el dashboard
-        // Por ejemplo, estadísticas básicas:
-        // model.addAttribute("totalTurnos", turnoService.contarTurnos());
 
         return "dashboard"; // -> templates/dashboard.html
     }
@@ -47,7 +44,7 @@ public class TurnoController {
     }
 
     /**
-     * Listar turnos básico (si lo necesitas más adelante)
+     * Listar turnos básico
      * GET /turnos/lista
      */
     @GetMapping("/lista")

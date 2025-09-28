@@ -1,32 +1,50 @@
 package com.centromedico.sistema_turnos.service.interfaces;
 
 import com.centromedico.sistema_turnos.dtos.CrearTurnoDto;
+import com.centromedico.sistema_turnos.dtos.TurnoDTO;
 import com.centromedico.sistema_turnos.model.Turno;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface TurnoService {
 
-    Turno crearTurno(CrearTurnoDto crearTurnoDto);
-    void llamarPaciente(Long turnoId);
-    void iniciarAtencion(Long turnoId);
-    void finalizarAtencion(Long turnoId);
-    List<Turno> obtenerTurnosDelDia(LocalDate fecha);
+    List<TurnoDTO> listarTodos();
 
-    // CRUD básico
-    Turno obtenerTurnoPorId(Long turnoId);
-    void cancelarTurno(Long turnoId);
+    /**
+     * Lista solo los turnos activos
+     */
+    List<TurnoDTO> listarActivos();
 
-    // Consultas por entidad (usas los métodos del repo que ya tienes)
-    List<Turno> obtenerTurnosPorMedico(Long medicoId, LocalDate fecha);
-    List<Turno> obtenerTurnosPorPaciente(Long pacienteId, LocalDate fecha);
-    List<Turno> obtenerTurnosPorEstado(String estado, LocalDate fecha);
+    /**
+     * Busca un turno por su ID
+     */
+    Optional<TurnoDTO> buscarPorId(Long id);
 
-    // Utilidades para el flujo de trabajo
-    List<Turno> obtenerTurnosEnEspera(LocalDate fecha);
-    List<Turno> obtenerTurnosEnEsperaPorMedico(Long medicoId, LocalDate fecha);
-    int contarTurnosDelDia(LocalDate fecha);
-    int contarTurnosPorMedico(Long medicoId, LocalDate fecha);
+    /**
+     * Crea un nuevo turno con validaciones
+     */
+    TurnoDTO crearTurno(CrearTurnoDto crearTurnoDto);
+
+    /**
+     * Actualiza un turno existente
+     */
+    TurnoDTO actualizarTurno(Long id, CrearTurnoDto crearTurnoDto);
+
+    /**
+     * Elimina un turno (soft delete)
+     */
+    void eliminarTurno(Long id);
+
+    /**
+     * Verifica si existe un turno con el ID especificado
+     */
+    boolean existeTurno(Long id);
+
+    /**
+     * Valida que el turno pueda ser modificado (no está finalizado/cancelado)
+     */
+    boolean puedeSerModificado(Long id);
 
 }

@@ -10,16 +10,28 @@ import java.util.Optional;
 
 public interface TurnoRepository extends JpaRepository<Turno, Long> {
 
-    //Crear turno
+// ===== MÉTODOS PARA CRUD BÁSICO =====
+
+    /**
+     * Buscar todos los turnos activos
+     * Para: listarActivos()
+     */
+    List<Turno> findByActivoTrue();
+
+    /**
+     * Buscar turno activo por ID
+     * Para: buscarPorId() con validación de activo
+     */
+    Optional<Turno> findByIdAndActivoTrue(Long id);
+
+
     List<Turno> findByMedicoIdAndFechaAndHoraProgramadaAndActivoTrue(
             Long medicoId, LocalDate fecha, LocalTime horaProgramada);
 
-    List<Turno> findByFechaAndActivoTrueOrderByHoraProgramadaAsc(LocalDate fecha);
+    /**
+     * Verificar si médico tiene otros turnos en la misma fecha
+     * Para: validaciones adicionales en crearTurno()
+     */
     List<Turno> findByMedicoIdAndFechaAndActivoTrue(Long medicoId, LocalDate fecha);
-    List<Turno> findByPacienteIdAndFechaAndActivoTrue(Long pacienteId, LocalDate fecha);
-    List<Turno> findByEstadoAndFechaAndActivoTrueOrderByHoraProgramadaAsc(String estado, LocalDate fecha);
-
-    // Agregar este que es esencial para CRUD
-    Optional<Turno> findByIdAndActivoTrue(Long id);
 
 }

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Formulario Médico</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 text-primary">
+                <i class="fas fa-user-md me-2"></i>
+                <span th:text="${titulo}">Formulario Médico</span>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/medicos}">Médicos</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${accion == 'crear' ? 'Nuevo' : 'Editar'}">Nuevo</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Datos del Médico
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="${accion == 'crear' ? '/medicos/nuevo' : '/medicos/' + medico.id + '/editar'}"
+                          th:object="${medico}"
+                          method="post">
+
+                        <!-- Nombre y Apellido -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label">
+                                    Nombre <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{nombre}"
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                                       id="nombre"
+                                       placeholder="Ingrese el nombre"
+                                       required>
+                                <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                    <span th:errors="*{nombre}">Error en nombre</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="apellido" class="form-label">
+                                    Apellido <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{apellido}"
+                                       th:classappend="${#fields.hasErrors('apellido')} ? 'is-invalid' : ''"
+                                       id="apellido"
+                                       placeholder="Ingrese el apellido"
+                                       required>
+                                <div th:if="${#fields.hasErrors('apellido')}" class="invalid-feedback">
+                                    <span th:errors="*{apellido}">Error en apellido</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DNI y Matrícula -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="dni" class="form-label">
+                                    DNI <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{dni}"
+                                       th:classappend="${#fields.hasErrors('dni')} ? 'is-invalid' : ''"
+                                       id="dni"
+                                       placeholder="Ej: 12345678"
+                                       maxlength="8"
+                                       required>
+                                <div th:if="${#fields.hasErrors('dni')}" class="invalid-feedback">
+                                    <span th:errors="*{dni}">Error en DNI</span>
+                                </div>
+                                <small class="form-text text-muted">7 u 8 dígitos sin puntos</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="matricula" class="form-label">
+                                    Matrícula <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{matricula}"
+                                       th:classappend="${#fields.hasErrors('matricula')} ? 'is-invalid' : ''"
+                                       id="matricula"
+                                       placeholder="Ej: MP12345"
+                                       required>
+                                <div th:if="${#fields.hasErrors('matricula')}" class="invalid-feedback">
+                                    <span th:errors="*{matricula}">Error en matrícula</span>
+                                </div>
+                                <small class="form-text text-muted">Matrícula profesional</small>
+                            </div>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{telefono}"
+                                       th:classappend="${#fields.hasErrors('telefono')} ? 'is-invalid' : ''"
+                                       id="telefono"
+                                       placeholder="Ej: 1234567890">
+                                <div th:if="${#fields.hasErrors('telefono')}" class="invalid-feedback">
+                                    <span th:errors="*{telefono}">Error en teléfono</span>
+                                </div>
+                                <small class="form-text text-muted">10 a 15 dígitos sin espacios</small>
+                            </div>
+                        </div>
+
+                        <!-- Nota informativa -->
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Nota:</strong> Los campos de especialidad y consultorio se asignarán posteriormente.
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/medicos}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${accion == 'crear' ? 'Crear Médico' : 'Guardar Cambios'}">Guardar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <i class="fas fa-lightbulb me-2"></i>Información
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
+                        <li>El DNI y la matrícula deben ser únicos en el sistema</li>
+                        <li>El teléfono es opcional pero recomendado</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Validación de solo números en DNI
+    document.getElementById('dni').addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+
+    // Validación de solo números en teléfono
+    document.getElementById('telefono').addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
+</body>
+</html>

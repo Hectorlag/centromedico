@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Formulario Consultorio</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 text-primary">
+                <i class="fas fa-door-open me-2"></i>
+                <span th:text="${titulo}">Formulario Consultorio</span>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/consultorios}">Consultorios</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${accion == 'crear' ? 'Nuevo' : 'Editar'}">Nuevo</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Datos del Consultorio
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="${accion == 'crear' ? '/consultorios/nuevo' : '/consultorios/' + consultorio.id + '/editar'}"
+                          th:object="${consultorio}"
+                          method="post">
+
+                        <!-- Número y Nombre -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="numero" class="form-label">
+                                    Número <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{numero}"
+                                       th:classappend="${#fields.hasErrors('numero')} ? 'is-invalid' : ''"
+                                       id="numero"
+                                       placeholder="Ej: 101"
+                                       required>
+                                <div th:if="${#fields.hasErrors('numero')}" class="invalid-feedback">
+                                    <span th:errors="*{numero}">Error en número</span>
+                                </div>
+                                <small class="form-text text-muted">Número identificador del consultorio</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{nombre}"
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                                       id="nombre"
+                                       placeholder="Ej: Sala A">
+                                <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                    <span th:errors="*{nombre}">Error en nombre</span>
+                                </div>
+                                <small class="form-text text-muted">Nombre descriptivo (opcional)</small>
+                            </div>
+                        </div>
+
+                        <!-- Piso -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="piso" class="form-label">Piso</label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{piso}"
+                                       th:classappend="${#fields.hasErrors('piso')} ? 'is-invalid' : ''"
+                                       id="piso"
+                                       placeholder="Ej: 1, PB, 2do">
+                                <div th:if="${#fields.hasErrors('piso')}" class="invalid-feedback">
+                                    <span th:errors="*{piso}">Error en piso</span>
+                                </div>
+                                <small class="form-text text-muted">Piso donde se ubica (opcional)</small>
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control"
+                                          th:field="*{descripcion}"
+                                          th:classappend="${#fields.hasErrors('descripcion')} ? 'is-invalid' : ''"
+                                          id="descripcion"
+                                          rows="3"
+                                          placeholder="Descripción adicional del consultorio..."></textarea>
+                                <div th:if="${#fields.hasErrors('descripcion')}" class="invalid-feedback">
+                                    <span th:errors="*{descripcion}">Error en descripción</span>
+                                </div>
+                                <small class="form-text text-muted">Información adicional (opcional)</small>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/consultorios}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${accion == 'crear' ? 'Crear Consultorio' : 'Guardar Cambios'}">Guardar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <i class="fas fa-lightbulb me-2"></i>Información
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
+                        <li>El número del consultorio debe ser único en el sistema</li>
+                        <li>Los campos nombre, piso y descripción son opcionales</li>
+                        <li>Puedes usar números, letras o combinaciones en el campo "Número"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

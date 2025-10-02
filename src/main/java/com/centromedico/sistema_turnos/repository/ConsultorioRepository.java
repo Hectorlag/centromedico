@@ -9,23 +9,13 @@ import java.util.Optional;
 
 public interface ConsultorioRepository extends JpaRepository<Consultorio, Long> {
 
-    // Buscar consultorios activos
-    List<Consultorio> findByActivoTrue();
+    //Médicos básicos para consultorios activos
+   List<Consultorio> findByActivoTrue();
+   Optional<Consultorio> findByIdAndActivoTrue(Long id);
+   boolean existsByIdAndActivoTrue(Long id);
 
-    // Buscar por número
+   //Buscar por número (para validaciones)
     Optional<Consultorio> findByNumero(String numero);
+    boolean existsByNumero(String numero);
 
-    // Buscar por piso
-    List<Consultorio> findByPisoAndActivoTrue(String piso);
-
-    // Consultorios ordenados por piso y número
-    List<Consultorio> findByActivoTrueOrderByPisoAscNumeroAsc();
-
-    // Consultorios disponibles (sin médicos asignados)
-    @Query("SELECT c FROM Consultorio c WHERE c.activo = true AND NOT EXISTS (SELECT m FROM Medico m WHERE m.consultorio = c AND m.activo = true)")
-    List<Consultorio> findConsultoriosDisponibles();
-
-    // Consultorios con médicos
-    @Query("SELECT c FROM Consultorio c WHERE c.activo = true AND EXISTS (SELECT m FROM Medico m WHERE m.consultorio = c AND m.activo = true)")
-    List<Consultorio> findConsultoriosConMedicos();
 }

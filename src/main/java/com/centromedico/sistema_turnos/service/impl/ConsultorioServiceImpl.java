@@ -1,5 +1,9 @@
 package com.centromedico.sistema_turnos.service.impl;
 
+import com.centromedico.sistema_turnos.dtos.ConsultorioDTO;
+import com.centromedico.sistema_turnos.exception.BadRequestException;
+import com.centromedico.sistema_turnos.exception.ResourceNotFoundException;
+import com.centromedico.sistema_turnos.mappers.ConsultorioMapper;
 import com.centromedico.sistema_turnos.model.Consultorio;
 import com.centromedico.sistema_turnos.repository.ConsultorioRepository;
 import com.centromedico.sistema_turnos.service.interfaces.ConsultorioService;
@@ -7,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,188 +25,121 @@ import java.util.stream.Collectors;
 public class ConsultorioServiceImpl implements ConsultorioService {
 
     private final ConsultorioRepository consultorioRepository;
-
-    // ==================== CRUD BÁSICO ====================
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Consultorio> findAll() {
-        log.debug("Buscando todos los consultorios");
-        return consultorioRepository.findAll();
-    }
+    private final ConsultorioMapper consultorioMapper;
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Consultorio> findById(Long id) {
-        log.debug("Buscando consultorio con ID: {}", id);
-        return consultorioRepository.findById(id);
+    public List<ConsultorioDTO> listarActivos() {
+        return consultorioRepository.findByActivoTrue()
+                .stream()
+                .map(consultorioMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Consultorio save(Consultorio consultorio) {
-        log.info("Guardando consultorio: {}", consultorio.getNombre());
-
-        // Validaciones
-        if (consultorio.getNombre() == null || consultorio.getNombre().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre del consultorio no puede estar vacío");
+    public Optional<ConsultorioDTO> buscarPorId(Long id) {
+        if (id == null || id <= 0) {
+            throw new BadRequestException("ID inválido: " + id);
         }
 
-        // Verificar si ya existe (solo para nuevos)
-        if (consultorio.getId() == null && existsByNombre(consultorio.getNombre())) {
-            throw new IllegalArgumentException("Ya existe un consultorio con ese nombre");
-        }
-
-        // Set timestamps si es nuevo
-        if (consultorio.getId() == null) {
-            consultorio.setCreatedAt(LocalDateTime.now());
-            consultorio.setActivo(true);
-        }
-        consultorio.setUpdatedAt(LocalDateTime.now());
-
-        return consultorioRepository.save(consultorio);
+        return consultorioRepository.findByIdAndActivoTrue(id)
+                .map(consultorioMapper::toDTO)
+                .or(() -> {
+                    throw new ResourceNotFoundException("Consultorio no encontrado con ID: " + id);
+                });
     }
 
     @Override
-    public void deleteById(Long id) {
-        log.info("Eliminando (borrado lógico) consultorio con ID: {}", id);
-
-        Consultorio consultorio = consultorioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Consultorio no encontrado con ID: " + id));
-
-        // Verificar si tiene médicos activos
-        boolean tieneMedicosActivos = consultorio.getMedicos() != null &&
-                consultorio.getMedicos().stream().anyMatch(medico -> medico.isActivo());
-
-        if (tieneMedicosActivos) {
-            throw new IllegalStateException("No se puede eliminar un consultorio con médicos activos");
+    @Transactional(readOnly = true)
+    public boolean existeYEstaActivo(Long id) {
+        if (id == null || id <= 0) {
+            return false;
         }
-
-        // BORRADO LÓGICO usando BaseEntity
-        consultorio.desactivar();
-        consultorioRepository.save(consultorio);
+        return consultorioRepository.existsByIdAndActivoTrue(id);
     }
 
     @Override
-    public void activar(Long id) {
-        log.info("Activando consultorio con ID: {}", id);
-        Consultorio consultorio = consultorioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Consultorio no encontrado con ID: " + id));
+    @Transactional(readOnly = true)
+    public Consultorio obtenerPorId(Long id) {
+        if (id == null || id <= 0) {
+            throw new BadRequestException("ID de consultorio inválido: " + id);
+        }
 
+        return consultorioRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Consultorio no encontrado con ID: " + id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ConsultorioDTO> buscarPorNumero(String numero) {
+        if (!StringUtils.hasText(numero)) {
+            return Optional.empty();
+        }
+
+        return consultorioRepository.findByNumero(numero)
+                .map(consultorioMapper::toDTO);
+    }
+
+    @Override
+    public ConsultorioDTO crear(ConsultorioDTO consultorioDTO) {
+        validarDatosObligatorios(consultorioDTO);
+
+        if (consultorioRepository.existsByNumero(consultorioDTO.getNumero())) {
+            throw new BadRequestException("Ya existe un consultorio con el número: " + consultorioDTO.getNumero());
+        }
+
+        Consultorio consultorio = consultorioMapper.toEntity(consultorioDTO);
         consultorio.setActivo(true);
-        consultorio.setUpdatedAt(LocalDateTime.now());
-        consultorioRepository.save(consultorio);
+        consultorio.setCreatedAt(LocalDateTime.now());
+
+        Consultorio guardado = consultorioRepository.save(consultorio);
+        return consultorioMapper.toDTO(guardado);
     }
 
     @Override
-    public void desactivar(Long id) {
-        log.info("Desactivando consultorio con ID: {}", id);
-        Consultorio consultorio = consultorioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Consultorio no encontrado con ID: " + id));
+    public ConsultorioDTO actualizar(Long id, ConsultorioDTO consultorioDTO) {
+        validarDatosObligatorios(consultorioDTO);
 
-        // Verificar si tiene médicos activos
-        boolean tieneMedicosActivos = consultorio.getMedicos() != null &&
-                consultorio.getMedicos().stream().anyMatch(medico -> medico.isActivo());
+        Consultorio consultorio = obtenerPorId(id);
 
-        if (tieneMedicosActivos) {
-            throw new IllegalStateException("No se puede desactivar un consultorio con médicos activos");
+        if (!consultorio.getNumero().equals(consultorioDTO.getNumero()) &&
+                consultorioRepository.existsByNumero(consultorioDTO.getNumero())) {
+            throw new BadRequestException("Ya existe un consultorio con el número: " + consultorioDTO.getNumero());
         }
 
+        consultorioMapper.updateEntityFromDTO(consultorioDTO, consultorio);
+        consultorio.setUpdatedAt(LocalDateTime.now());
+
+        Consultorio actualizado = consultorioRepository.save(consultorio);
+        return consultorioMapper.toDTO(actualizado);
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        Consultorio consultorio = obtenerPorId(id);
         consultorio.setActivo(false);
         consultorio.setUpdatedAt(LocalDateTime.now());
         consultorioRepository.save(consultorio);
     }
 
-    // ==================== BÚSQUEDAS ESPECÍFICAS ====================
-
     @Override
     @Transactional(readOnly = true)
-    public List<Consultorio> findActivos() {
-        log.debug("Buscando consultorios activos");
-        return consultorioRepository.findByActivoTrue();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Consultorio> findByNombre(String nombre) {
-        log.debug("Buscando consultorio por nombre: {}", nombre);
-        // Nota: Necesitarías agregar este método al repo si usas "nombre"
-        // return consultorioRepository.findByNombre(nombre);
-
-        // O si usas "numero":
-        return consultorioRepository.findByNumero(nombre);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Consultorio> findByPiso(String piso) {
-        log.debug("Buscando consultorios en piso: {}", piso);
-        return consultorioRepository.findByPisoAndActivoTrue(piso);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Consultorio> findActivosOrdenados() {
-        log.debug("Buscando consultorios activos ordenados");
-        return consultorioRepository.findByActivoTrueOrderByPisoAscNumeroAsc();
-    }
-
-    // ==================== DISPONIBILIDAD ====================
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Consultorio> findDisponibles() {
-        log.debug("Buscando consultorios disponibles");
-        return consultorioRepository.findConsultoriosDisponibles();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Consultorio> findConMedicos() {
-        log.debug("Buscando consultorios con médicos");
-        return consultorioRepository.findConsultoriosConMedicos();
-    }
-
-    // ==================== VALIDACIONES ====================
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existsByNombre(String nombre) {
-        // Nota: Agregar al repo si necesitas este método
-        return consultorioRepository.findByNumero(nombre).isPresent();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isDisponible(Long consultorioId) {
-        return consultorioRepository.findById(consultorioId)
-                .map(consultorio -> consultorio.isActivo() &&
-                        (consultorio.getMedicos() == null || consultorio.getMedicos().isEmpty()))
-                .orElse(false);
-    }
-
-    // ==================== ESTADÍSTICAS ====================
-
-    @Override
-    @Transactional(readOnly = true)
-    public long countActivos() {
-        return consultorioRepository.findByActivoTrue().size();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public long countDisponibles() {
-        return consultorioRepository.findConsultoriosDisponibles().size();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<String> getPisosDisponibles() {
-        return consultorioRepository.findByActivoTrue()
+    public List<ConsultorioDTO> listarTodos() {
+        return consultorioRepository.findAll()
                 .stream()
-                .map(Consultorio::getPiso)
-                .distinct()
-                .sorted()
+                .map(consultorioMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    private void validarDatosObligatorios(ConsultorioDTO consultorioDTO) {
+        if (consultorioDTO == null) {
+            throw new BadRequestException("Los datos del consultorio no pueden ser nulos");
+        }
+
+        if (!StringUtils.hasText(consultorioDTO.getNumero())) {
+            throw new BadRequestException("El número del consultorio es obligatorio");
+        }
+    }
+
 
 }

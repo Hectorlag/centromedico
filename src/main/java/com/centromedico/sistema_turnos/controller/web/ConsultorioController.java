@@ -17,18 +17,18 @@ public class ConsultorioController {
 
     private final ConsultorioService consultorioService;
 
-    @GetMapping()
-    public String listarConsultorio(Model model) {
+    @GetMapping
+    public String listarConsultorios(Model model) {
         model.addAttribute("consultorios", consultorioService.listarActivos());
-        model.addAttribute("consultorio", "Lista de consultorios");
+        model.addAttribute("titulo", "Lista de Consultorios");
         return "consultorios/lista";
     }
 
     @GetMapping("/{id}")
     public String verConsultorio(@PathVariable Long id, Model model) {
-        model.addAttribute("consultorio", consultorioService.buscarPorId(id));
+        model.addAttribute("consultorio", consultorioService.buscarPorId(id).get());
         model.addAttribute("titulo", "Detalle del Consultorio");
-        return "consultorio/detalle";
+        return "consultorios/detalle";
     }
 
     @GetMapping("/nuevo")
@@ -44,6 +44,13 @@ public class ConsultorioController {
                                    BindingResult result,
                                    Model model,
                                    RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("titulo", "Nuevo Consultorio");
+            model.addAttribute("accion", "crear");
+            return "consultorios/formulario";
+        }
+
         ConsultorioDTO consultorioCreado = consultorioService.crear(consultorioDTO);
         redirectAttributes.addFlashAttribute("success",
                 "Consultorio creado exitosamente: " + consultorioCreado.getNumero());
@@ -59,10 +66,12 @@ public class ConsultorioController {
     }
 
     @PostMapping("/{id}/editar")
-    public String actualizarConsultorio(@PathVariable Long id, @Valid @ModelAttribute("consultorio") ConsultorioDTO consultorioDTO,
+    public String actualizarConsultorio(@PathVariable Long id,
+                                        @Valid @ModelAttribute("consultorio") ConsultorioDTO consultorioDTO,
                                         BindingResult result,
                                         Model model,
                                         RedirectAttributes redirectAttributes) {
+
         if (result.hasErrors()) {
             model.addAttribute("titulo", "Editar Consultorio");
             model.addAttribute("accion", "editar");
@@ -95,6 +104,5 @@ public class ConsultorioController {
         model.addAttribute("piso", piso);
         return "consultorios/buscar";
     }
-
 }
 

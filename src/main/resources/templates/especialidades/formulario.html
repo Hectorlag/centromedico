@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Formulario Especialidad</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 text-primary">
+                <i class="fas fa-stethoscope me-2"></i>
+                <span th:text="${titulo}">Formulario Especialidad</span>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/especialidades}">Especialidades</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${accion == 'crear' ? 'Nueva' : 'Editar'}">Nueva</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Datos de la Especialidad
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post"
+                          th:object="${especialidad}">
+
+                        <!-- Nombre -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="nombre" class="form-label">
+                                    Nombre <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{nombre}"
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                                       id="nombre"
+                                       placeholder="Ej: Cardiología, Pediatría, Dermatología"
+                                       required>
+                                <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                    <span th:errors="*{nombre}">Error en nombre</span>
+                                </div>
+                                <small class="form-text text-muted">Nombre de la especialidad médica</small>
+                            </div>
+                        </div>
+
+                        <!-- Duración Turno -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="duracionTurnoMinutos" class="form-label">
+                                    Duración del Turno (minutos)
+                                </label>
+                                <input type="number"
+                                       class="form-control"
+                                       th:field="*{duracionTurnoMinutos}"
+                                       th:classappend="${#fields.hasErrors('duracionTurnoMinutos')} ? 'is-invalid' : ''"
+                                       id="duracionTurnoMinutos"
+                                       placeholder="Ej: 30"
+                                       min="5"
+                                       step="5">
+                                <div th:if="${#fields.hasErrors('duracionTurnoMinutos')}" class="invalid-feedback">
+                                    <span th:errors="*{duracionTurnoMinutos}">Error en duración</span>
+                                </div>
+                                <small class="form-text text-muted">Tiempo estimado por consulta (opcional)</small>
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control"
+                                          th:field="*{descripcion}"
+                                          th:classappend="${#fields.hasErrors('descripcion')} ? 'is-invalid' : ''"
+                                          id="descripcion"
+                                          rows="4"
+                                          placeholder="Descripción de la especialidad médica..."></textarea>
+                                <div th:if="${#fields.hasErrors('descripcion')}" class="invalid-feedback">
+                                    <span th:errors="*{descripcion}">Error en descripción</span>
+                                </div>
+                                <small class="form-text text-muted">Información adicional sobre la especialidad (opcional)</small>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/especialidades}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${accion == 'crear' ? 'Crear Especialidad' : 'Guardar Cambios'}">Guardar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <i class="fas fa-lightbulb me-2"></i>Información
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
+                        <li>El nombre de la especialidad debe ser único en el sistema</li>
+                        <li>La duración del turno es opcional y se usa como referencia para agendar citas</li>
+                        <li>La descripción ayuda a identificar el tipo de atención que ofrece la especialidad</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Validación para que la duración sea múltiplo de 5
+    const duracionInput = document.getElementById('duracionTurnoMinutos');
+    if (duracionInput) {
+        duracionInput.addEventListener('change', function(e) {
+            if (this.value && this.value % 5 !== 0) {
+                const nearest = Math.round(this.value / 5) * 5;
+                this.value = nearest;
+            }
+        });
+    }
+</script>
+</body>
+</html>

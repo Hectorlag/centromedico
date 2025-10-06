@@ -7,9 +7,14 @@ import com.centromedico.sistema_turnos.exception.ResourceNotFoundException;
 import com.centromedico.sistema_turnos.mappers.ConsultorioMapper;
 import com.centromedico.sistema_turnos.mappers.EspecialidadMapper;
 import com.centromedico.sistema_turnos.mappers.MedicoMapper;
+import com.centromedico.sistema_turnos.model.Consultorio;
+import com.centromedico.sistema_turnos.model.Especialidad;
 import com.centromedico.sistema_turnos.model.Medico;
+import com.centromedico.sistema_turnos.repository.ConsultorioRepository;
+import com.centromedico.sistema_turnos.repository.EspecialidadRepository;
 import com.centromedico.sistema_turnos.repository.MedicoRepository;
 import com.centromedico.sistema_turnos.service.interfaces.MedicoService;
+import javassist.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +32,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class MedicoServiceImpl implements MedicoService {
 
+    private final ConsultorioRepository consultorioRepository;
+    private final EspecialidadRepository especialidadRepository;
     private final MedicoRepository medicoRepository;
     private final EspecialidadMapper especialidadMapper;
     private final ConsultorioMapper consultorioMapper;
@@ -132,20 +139,35 @@ public class MedicoServiceImpl implements MedicoService {
     // ============== MÉTODOS CRUD ADICIONALES ==============
 
     @Override
+    @Transactional
     public MedicoDTO crear(MedicoDTO medicoDTO) {
         validarDatosObligatorios(medicoDTO);
 
-        // Validar que no exista el DNI
         if (medicoRepository.existsByDni(medicoDTO.getDni())) {
             throw new BadRequestException("Ya existe un médico con el DNI: " + medicoDTO.getDni());
         }
 
-        // Validar que no exista la matrícula
         if (medicoRepository.existsByMatricula(medicoDTO.getMatricula())) {
             throw new BadRequestException("Ya existe un médico con la matrícula: " + medicoDTO.getMatricula());
         }
 
-        Medico medico = convertirAEntity(medicoDTO);
+        // Convertir DTO a entidad (sin relaciones)
+        Medico medico = medicoMapper.toEntity(medicoDTO);
+
+        // Asignar especialidad
+        if (medicoDTO.getEspecialidadId() != null) {
+            Especialidad especialidad = especialidadRepository.findById(medicoDTO.getEspecialidadId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Especialidad no encontrada"));
+            medico.setEspecialidad(especialidad);
+        }
+
+        // Asignar consultorio
+        if (medicoDTO.getConsultorioId() != null) {
+            Consultorio consultorio = consultorioRepository.findById(medicoDTO.getConsultorioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Consultorio no encontrado"));
+            medico.setConsultorio(consultorio);
+        }
+
         medico.setActivo(true);
         medico.setCreatedAt(LocalDateTime.now());
 
@@ -154,24 +176,47 @@ public class MedicoServiceImpl implements MedicoService {
     }
 
     @Override
+    @Transactional
     public MedicoDTO actualizar(Long id, MedicoDTO medicoDTO) {
-        validarDatosObligatorios(medicoDTO);
-
-        Medico medico = obtenerPorId(id);
+        // Buscar el médico existente
+        Medico medico = medicoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Médico no encontrado con ID: " + id));
 
         // Verificar DNI si cambió
-        if (!medico.getDni().equals(medicoDTO.getDni()) &&
-                medicoRepository.existsByDni(medicoDTO.getDni())) {
-            throw new BadRequestException("Ya existe un médico con el DNI: " + medicoDTO.getDni());
+        if (!medico.getDni().equals(medicoDTO.getDni())) {
+            if (medicoRepository.existsByDni(medicoDTO.getDni())) {
+                throw new BadRequestException("Ya existe un médico con el DNI: " + medicoDTO.getDni());
+            }
         }
 
         // Verificar matrícula si cambió
-        if (!medico.getMatricula().equals(medicoDTO.getMatricula()) &&
-                medicoRepository.existsByMatricula(medicoDTO.getMatricula())) {
-            throw new BadRequestException("Ya existe un médico con la matrícula: " + medicoDTO.getMatricula());
+        if (!medico.getMatricula().equals(medicoDTO.getMatricula())) {
+            if (medicoRepository.existsByMatricula(medicoDTO.getMatricula())) {
+                throw new BadRequestException("Ya existe un médico con la matrícula: " + medicoDTO.getMatricula());
+            }
         }
 
-        actualizarCampos(medico, medicoDTO);
+        // Actualizar campos básicos usando el mapper
+        medicoMapper.updateEntityFromDTO(medicoDTO, medico);
+
+        // Actualizar especialidad
+        if (medicoDTO.getEspecialidadId() != null) {
+            Especialidad especialidad = especialidadRepository.findById(medicoDTO.getEspecialidadId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Especialidad no encontrada con ID: " + medicoDTO.getEspecialidadId()));
+            medico.setEspecialidad(especialidad);
+        } else {
+            medico.setEspecialidad(null);
+        }
+
+        // Actualizar consultorio
+        if (medicoDTO.getConsultorioId() != null) {
+            Consultorio consultorio = consultorioRepository.findById(medicoDTO.getConsultorioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Consultorio no encontrado con ID: " + medicoDTO.getConsultorioId()));
+            medico.setConsultorio(consultorio);
+        } else {
+            medico.setConsultorio(null);
+        }
+
         medico.setUpdatedAt(LocalDateTime.now());
 
         Medico actualizado = medicoRepository.save(medico);

@@ -2,6 +2,8 @@ package com.centromedico.sistema_turnos.controller.web;
 
 import com.centromedico.sistema_turnos.dtos.MedicoDTO;
 import com.centromedico.sistema_turnos.dtos.MedicoDetalleDTO;
+import com.centromedico.sistema_turnos.service.interfaces.ConsultorioService;
+import com.centromedico.sistema_turnos.service.interfaces.EspecialidadService;
 import com.centromedico.sistema_turnos.service.interfaces.MedicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class MedicoController {
 
     private final MedicoService medicoService;
+    private final EspecialidadService especialidadService; // NUEVO
+    private final ConsultorioService consultorioService;
 
     @GetMapping
     public String listarMedicos(Model model) {
@@ -36,14 +40,16 @@ public class MedicoController {
         return "medicos/detalle";
     }
 
-
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
         model.addAttribute("medico", new MedicoDTO());
+        model.addAttribute("especialidades", especialidadService.listarActivos()); // AGREGAR
+        model.addAttribute("consultorios", consultorioService.listarActivos());     // AGREGAR
         model.addAttribute("titulo", "Nuevo Médico");
         model.addAttribute("accion", "crear");
         return "medicos/formulario";
     }
+
 
     @PostMapping("/nuevo")
     public String crearMedico(@Valid @ModelAttribute("medico") MedicoDTO medicoDTO,
@@ -51,6 +57,8 @@ public class MedicoController {
                               Model model,
                               RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("especialidades", especialidadService.listarActivos()); // AGREGAR
+            model.addAttribute("consultorios", consultorioService.listarActivos());     // AGREGAR
             model.addAttribute("titulo", "Nuevo Médico");
             model.addAttribute("accion", "crear");
             return "medicos/formulario";
@@ -58,7 +66,7 @@ public class MedicoController {
 
         MedicoDTO medicoCreado = medicoService.crear(medicoDTO);
         redirectAttributes.addFlashAttribute("success",
-                "Médico creado exitosamente: Dr . Dra. " + medicoCreado.getNombreCompleto());
+                "Médico creado exitosamente: Dr./Dra. " + medicoCreado.getNombreCompleto());
 
         return "redirect:/medicos/" + medicoCreado.getId();
     }
@@ -66,6 +74,8 @@ public class MedicoController {
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
         model.addAttribute("medico", medicoService.buscarPorId(id).get());
+        model.addAttribute("especialidades", especialidadService.listarActivos()); // AGREGAR
+        model.addAttribute("consultorios", consultorioService.listarActivos());     // AGREGAR
         model.addAttribute("titulo", "Editar Médico");
         model.addAttribute("accion", "editar");
         return "medicos/formulario";
@@ -79,6 +89,8 @@ public class MedicoController {
                                    RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
+            model.addAttribute("especialidades", especialidadService.listarActivos()); // AGREGAR
+            model.addAttribute("consultorios", consultorioService.listarActivos());     // AGREGAR
             model.addAttribute("titulo", "Editar Médico");
             model.addAttribute("accion", "editar");
             return "medicos/formulario";

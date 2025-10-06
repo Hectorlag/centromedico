@@ -19,7 +19,9 @@ public class MedicoMapper {
         dto.setDni(medico.getDni());
         dto.setMatricula(medico.getMatricula());
         dto.setTelefono(medico.getTelefono());
-        dto.setActivo(true); // Hardeado
+        dto.setActivo(medico.isActivo());
+        dto.setCreatedAt(medico.getCreatedAt());
+        dto.setUpdatedAt(medico.getUpdatedAt());
 
         // Campos opcionales con null-check
         if (medico.getEspecialidad() != null) {
@@ -32,6 +34,37 @@ public class MedicoMapper {
         }
 
         return dto;
+    }
+
+    // NUEVO - Mapeo DTO → Entity
+    public Medico toEntity(MedicoDTO dto) {
+        if (dto == null) return null;
+
+        Medico medico = new Medico();
+        medico.setId(dto.getId());
+        medico.setNombre(dto.getNombre());
+        medico.setApellido(dto.getApellido());
+        medico.setDni(dto.getDni());
+        medico.setMatricula(dto.getMatricula());
+        medico.setTelefono(dto.getTelefono());
+        medico.setActivo(dto.isActivo());
+
+        // Las relaciones (especialidad y consultorio) NO se mapean aquí
+        // Se asignan manualmente en el servicio después de buscarlas en los repositorios
+
+        return medico;
+    }
+
+    // NUEVO - Actualizar entidad existente desde DTO
+    public void updateEntityFromDTO(MedicoDTO dto, Medico medico) {
+        if (dto == null || medico == null) return;
+
+        medico.setNombre(dto.getNombre());
+        medico.setApellido(dto.getApellido());
+        medico.setDni(dto.getDni());
+        medico.setMatricula(dto.getMatricula());
+        medico.setTelefono(dto.getTelefono());
+
     }
 }
 

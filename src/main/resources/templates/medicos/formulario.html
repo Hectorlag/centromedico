@@ -131,10 +131,47 @@
                             </div>
                         </div>
 
-                        <!-- Nota informativa -->
-                        <div class="alert alert-info" role="alert">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Nota:</strong> Los campos de especialidad y consultorio se asignarán posteriormente.
+                        <!-- Especialidad y Consultorio -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="especialidadId" class="form-label">
+                                    Especialidad <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select"
+                                        th:field="*{especialidadId}"
+                                        th:classappend="${#fields.hasErrors('especialidadId')} ? 'is-invalid' : ''"
+                                        id="especialidadId"
+                                        required>
+                                    <option value="">Seleccione una especialidad</option>
+                                    <option th:each="esp : ${especialidades}"
+                                            th:value="${esp.id}"
+                                            th:text="${esp.nombre}">
+                                    </option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('especialidadId')}" class="invalid-feedback">
+                                    <span th:errors="*{especialidadId}">Error en especialidad</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="consultorioId" class="form-label">
+                                    Consultorio <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select"
+                                        th:field="*{consultorioId}"
+                                        th:classappend="${#fields.hasErrors('consultorioId')} ? 'is-invalid' : ''"
+                                        id="consultorioId"
+                                        required>
+                                    <option value="">Seleccione un consultorio</option>
+                                    <option th:each="cons : ${consultorios}"
+                                            th:value="${cons.id}"
+                                            th:text="${'N° ' + cons.numero + (cons.piso != null ? ' - Piso ' + cons.piso : '')}">
+                                    </option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('consultorioId')}" class="invalid-feedback">
+                                    <span th:errors="*{consultorioId}">Error en consultorio</span>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Botones -->
@@ -160,7 +197,7 @@
                     <ul class="mb-0">
                         <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
                         <li>El DNI y la matrícula deben ser únicos en el sistema</li>
-                        <li>El teléfono es opcional pero recomendado</li>
+                        <li>La especialidad y consultorio pueden modificarse posteriormente</li>
                     </ul>
                 </div>
             </div>

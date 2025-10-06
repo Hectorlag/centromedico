@@ -28,10 +28,13 @@ public class MedicoController {
 
     @GetMapping("/{id}")
     public String verMedico(@PathVariable Long id, Model model) {
-        model.addAttribute("medico", medicoService.buscarPorId(id));
+        MedicoDTO medico = medicoService.buscarPorId(id)
+                .orElseThrow(() -> new RuntimeException("Médico no encontrado"));
+        model.addAttribute("medico", medico);
         model.addAttribute("titulo", "Detalle del Médico");
         return "medicos/detalle";
     }
+
 
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {

@@ -1,5 +1,10 @@
 package com.centromedico.sistema_turnos.service.impl;
 
+import ch.qos.logback.core.util.StringUtil;
+import com.centromedico.sistema_turnos.dtos.EspecialidadDTO;
+import com.centromedico.sistema_turnos.exception.BadRequestException;
+import com.centromedico.sistema_turnos.exception.ResourceNotFoundException;
+import com.centromedico.sistema_turnos.mappers.EspecialidadMapper;
 import com.centromedico.sistema_turnos.model.Especialidad;
 import com.centromedico.sistema_turnos.repository.EspecialidadRepository;
 import com.centromedico.sistema_turnos.service.interfaces.EspecialidadService;
@@ -7,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,162 +26,123 @@ import java.util.stream.Collectors;
 public class EspecialidadServiceImpl implements EspecialidadService {
 
     private final EspecialidadRepository especialidadRepository;
+    private final EspecialidadMapper especialidadMapper;
 
-    // ==================== CRUD BÁSICO ====================
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Especialidad> findAll() {
-        log.debug("Buscando todas las especialidades");
-        return especialidadRepository.findAll();
-    }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Especialidad> findById(Long id) {
-        log.debug("Buscando especialidad con ID: {}", id);
-        return especialidadRepository.findById(id);
-    }
-
-    @Override
-    public Especialidad save(Especialidad especialidad) {
-        log.info("Guardando especialidad: {}", especialidad.getNombre());
-
-        // Validaciones
-        if (especialidad.getNombre() == null || especialidad.getNombre().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre de la especialidad no puede estar vacío");
-        }
-
-        if (especialidad.getDuracionTurnoMinutos() == null || especialidad.getDuracionTurnoMinutos() <= 0) {
-            throw new IllegalArgumentException("La duración del turno debe ser mayor a 0 minutos");
-        }
-
-        // Verificar si ya existe (solo para nuevos)
-        if (especialidad.getId() == null && existsByNombre(especialidad.getNombre())) {
-            throw new IllegalArgumentException("Ya existe una especialidad con ese nombre");
-        }
-
-        // Si es nueva, activarla usando BaseEntity
-        if (especialidad.getId() == null) {
-            especialidad.activar();
-        }
-
-        return especialidadRepository.save(especialidad);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        log.info("Eliminando (borrado lógico) especialidad con ID: {}", id);
-
-        Especialidad especialidad = especialidadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
-
-        // Verificar si tiene médicos activos
-        if (tieneMedicosActivos(id)) {
-            throw new IllegalStateException("No se puede eliminar una especialidad con médicos activos");
-        }
-
-        // BORRADO LÓGICO usando BaseEntity
-        especialidad.desactivar();
-        especialidadRepository.save(especialidad);
-    }
-
-    @Override
-    public void activar(Long id) {
-        log.info("Activando especialidad con ID: {}", id);
-        Especialidad especialidad = especialidadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
-
-        // Usar método de BaseEntity
-        especialidad.activar();
-        especialidadRepository.save(especialidad);
-    }
-
-    @Override
-    public void desactivar(Long id) {
-        log.info("Desactivando especialidad con ID: {}", id);
-        Especialidad especialidad = especialidadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Especialidad no encontrada con ID: " + id));
-
-        // Verificar si tiene médicos activos
-        if (tieneMedicosActivos(id)) {
-            throw new IllegalStateException("No se puede desactivar una especialidad con médicos activos");
-        }
-
-        // Usar método de BaseEntity
-        especialidad.desactivar();
-        especialidadRepository.save(especialidad);
-    }
-
-    // ==================== BÚSQUEDAS ESPECÍFICAS ====================
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Especialidad> findActivas() {
-        log.debug("Buscando especialidades activas");
-        return especialidadRepository.findByActivoTrue();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Especialidad> findByNombre(String nombre) {
-        log.debug("Buscando especialidad por nombre: {}", nombre);
-        return especialidadRepository.findByNombreIgnoreCase(nombre);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Especialidad> findByTexto(String texto) {
-        log.debug("Buscando especialidades que contengan: {}", texto);
-        return especialidadRepository.findByNombreContainingIgnoreCaseAndActivoTrue(texto);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Especialidad> findConMedicosActivos() {
-        log.debug("Buscando especialidades con médicos activos");
-        return especialidadRepository.findEspecialidadesConMedicosActivos();
-    }
-
-    // ==================== VALIDACIONES ====================
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existsByNombre(String nombre) {
-        return especialidadRepository.findByNombreIgnoreCase(nombre).isPresent();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean tieneMedicosActivos(Long especialidadId) {
-        return especialidadRepository.contarMedicosActivosPorEspecialidad(especialidadId) > 0;
-    }
-
-    // ==================== ESTADÍSTICAS ====================
-
-    @Override
-    @Transactional(readOnly = true)
-    public long countActivas() {
-        return especialidadRepository.findByActivoTrue().size();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public long countMedicosActivos(Long especialidadId) {
-        return especialidadRepository.contarMedicosActivosPorEspecialidad(especialidadId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Especialidad> findMasSolicitadas() {
-        // Ordenar por cantidad de médicos (las que más médicos tienen = más solicitadas)
-        return especialidadRepository.findEspecialidadesConMedicosActivos()
+    public List<EspecialidadDTO> listarActivos(){
+        return especialidadRepository.findByActivoTrue()
                 .stream()
-                .sorted((e1, e2) -> {
-                    Long count1 = especialidadRepository.contarMedicosActivosPorEspecialidad(e1.getId());
-                    Long count2 = especialidadRepository.contarMedicosActivosPorEspecialidad(e2.getId());
-                    return count2.compareTo(count1); // Orden descendente
-                })
+                .map(especialidadMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<EspecialidadDTO> buscarPorId(Long id) {
+        if(id == null || id <= 0){
+            throw new BadRequestException("Id invalido" + id);
+        }
+
+        return  especialidadRepository.findByIdAndActivoTrue(id)
+                .map(especialidadMapper::toDTO)
+                .or(() -> {
+                  throw  new BadRequestException("Especialidad no encontrada" + "con el id: " + id);
+                });
+    }
+
+    @Override
+    public boolean existeYEstaActivo(Long id) {
+        if (id == null || id <= 0) {
+            return false;
+        }
+        return especialidadRepository.existsByIdAndActivoTrue(id);
+    }
+
+    @Override
+    public Especialidad obtenerPorId(Long id) {
+        if(id == null || id <= 0){
+            throw new BadRequestException("ID invalido" + id);
+        }
+
+        return especialidadRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Especialidad no encontrada" + id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<EspecialidadDTO> buscarPorNombre(String nombre) {
+        if(!StringUtils.hasText(nombre)){
+            return Optional.empty();
+        }
+
+        return especialidadRepository.findByNombre(nombre)
+                .map(especialidadMapper::toDTO);
+    }
+
+    @Override
+    public EspecialidadDTO crear(EspecialidadDTO especialidadDTO) {
+        validarDatosObligatorios(especialidadDTO);
+
+        if(especialidadRepository.existsByNombre(especialidadDTO.getNombre())){
+            throw new BadRequestException("Ya existe una especilidad con ese nombre");
+        }
+
+        Especialidad especialidad = especialidadMapper.toEntity(especialidadDTO);
+        especialidad.setActivo(true);
+        especialidad.setCreatedAt(LocalDateTime.now());
+
+        Especialidad guardado = especialidadRepository.save(especialidad);
+        return especialidadMapper.toDTO(guardado);
+    }
+
+    @Override
+    public EspecialidadDTO actualizar(Long id, EspecialidadDTO especialidadDTO) {
+        validarDatosObligatorios(especialidadDTO);
+
+        Especialidad especialidad = obtenerPorId(id);
+
+        if (!especialidad.getNombre().equals(especialidadDTO.getNombre()) &&
+                especialidadRepository.existsByNombre(especialidadDTO.getNombre())) {
+            throw new BadRequestException("Ya existe una especialidad con el nombre: " + especialidadDTO.getNombre());
+        }
+
+        especialidadMapper.updateEntityFromDTO(especialidadDTO, especialidad);
+        especialidad.setUpdatedAt(LocalDateTime.now());
+
+        Especialidad actualizado = especialidadRepository.save(especialidad);
+        return especialidadMapper.toDTO(actualizado);
+    }
+
+
+    @Override
+    public void eliminar(Long id) {
+    Especialidad especialidad = obtenerPorId(id);
+    especialidad.setActivo(false);
+    especialidad.setUpdatedAt(LocalDateTime.now());
+    especialidadRepository.save(especialidad);
+    }
+
+    @Override
+    public List<EspecialidadDTO> listarTodos() {
+        return especialidadRepository.findAll()
+                .stream()
+                .map(especialidadMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    //MÉTODO AUXILIAR
+    private void validarDatosObligatorios(EspecialidadDTO especialidadDTO){
+        if(especialidadDTO == null){
+            throw new BadRequestException("Los datos de la especialidad no pueden ser nulos");
+        }
+        if(!StringUtils.hasText(especialidadDTO.getNombre())){
+            throw new BadRequestException("El nombre de la especialidad es obligatorio");
+        }
+        if(especialidadDTO.getDuracionTurnoMinutos() != null &&
+           especialidadDTO.getDuracionTurnoMinutos() <= 0){
+           throw new BadRequestException("La duración del turno debe ser mayor a 0");
+        }
     }
 }

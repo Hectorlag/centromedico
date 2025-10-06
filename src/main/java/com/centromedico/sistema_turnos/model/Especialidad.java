@@ -24,5 +24,4 @@ public class Especialidad extends BaseEntity{
 
     @OneToMany(mappedBy = "especialidad")
     private Set<Medico> medicos;
-
 }

@@ -1,5 +1,6 @@
 package com.centromedico.sistema_turnos.service.interfaces;
 
+import com.centromedico.sistema_turnos.dtos.EspecialidadDTO;
 import com.centromedico.sistema_turnos.model.Especialidad;
 
 import java.util.List;
@@ -7,27 +8,17 @@ import java.util.Optional;
 
 public interface EspecialidadService {
 
-    // CRUD básico
-    List<Especialidad> findAll();
-    Optional<Especialidad> findById(Long id);
-    Especialidad save(Especialidad especialidad);
-    void deleteById(Long id);
-    void activar(Long id);
-    void desactivar(Long id);
+    // Métodos de consulta
+    List<EspecialidadDTO> listarActivos();
+    Optional<EspecialidadDTO> buscarPorId(Long id);
+    boolean existeYEstaActivo(Long id);
+    Especialidad obtenerPorId(Long id);
+    Optional<EspecialidadDTO> buscarPorNombre(String nombre);
 
-    // Búsquedas específicas
-    List<Especialidad> findActivas();
-    Optional<Especialidad> findByNombre(String nombre);
-    List<Especialidad> findByTexto(String texto);
-    List<Especialidad> findConMedicosActivos();
-
-    // Validaciones
-    boolean existsByNombre(String nombre);
-    boolean tieneMedicosActivos(Long especialidadId);
-
-    // Estadísticas
-    long countActivas();
-    long countMedicosActivos(Long especialidadId);
-    List<Especialidad> findMasSolicitadas();
+    // Métodos CRUD
+    EspecialidadDTO crear(EspecialidadDTO especialidadDTO);
+    EspecialidadDTO actualizar(Long id, EspecialidadDTO especialidadDTO);
+    void eliminar(Long id);
+    List<EspecialidadDTO> listarTodos();
 }
 

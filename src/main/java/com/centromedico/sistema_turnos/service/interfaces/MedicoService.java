@@ -1,6 +1,7 @@
 package com.centromedico.sistema_turnos.service.interfaces;
 
 import com.centromedico.sistema_turnos.dtos.MedicoDTO;
+import com.centromedico.sistema_turnos.dtos.MedicoDetalleDTO;
 import com.centromedico.sistema_turnos.model.Medico;
 
 import java.util.List;
@@ -29,4 +30,5 @@ public interface MedicoService {
 
     List<MedicoDTO> listarTodos();
 
+    Optional<MedicoDetalleDTO> buscarDetallePorId(Long id);
 }

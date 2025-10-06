@@ -1,8 +1,11 @@
 package com.centromedico.sistema_turnos.service.impl;
 
 import com.centromedico.sistema_turnos.dtos.MedicoDTO;
+import com.centromedico.sistema_turnos.dtos.MedicoDetalleDTO;
 import com.centromedico.sistema_turnos.exception.BadRequestException;
 import com.centromedico.sistema_turnos.exception.ResourceNotFoundException;
+import com.centromedico.sistema_turnos.mappers.ConsultorioMapper;
+import com.centromedico.sistema_turnos.mappers.EspecialidadMapper;
 import com.centromedico.sistema_turnos.mappers.MedicoMapper;
 import com.centromedico.sistema_turnos.model.Medico;
 import com.centromedico.sistema_turnos.repository.MedicoRepository;
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
 public class MedicoServiceImpl implements MedicoService {
 
     private final MedicoRepository medicoRepository;
+    private final EspecialidadMapper especialidadMapper;
+    private final ConsultorioMapper consultorioMapper;
     private final MedicoMapper medicoMapper;
 
     // ============== MÉTODOS DE LA INTERFAZ ==============
@@ -36,6 +41,37 @@ public class MedicoServiceImpl implements MedicoService {
                 .stream()
                 .map(medicoMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<MedicoDetalleDTO> buscarDetallePorId(Long id) {
+        return medicoRepository.findById(id)
+                .map(medico -> {
+                    MedicoDetalleDTO dto = MedicoDetalleDTO.builder()
+                            .id(medico.getId())
+                            .nombre(medico.getNombre())
+                            .apellido(medico.getApellido())
+                            .dni(medico.getDni())
+                            .matricula(medico.getMatricula())
+                            .telefono(medico.getTelefono())
+                            .activo(medico.getActivo())
+                            .createdAt(medico.getCreatedAt())
+                            .updatedAt(medico.getUpdatedAt())
+                            .build();
+
+                    // Mapear especialidad (SINGULAR)
+                    if (medico.getEspecialidad() != null) {
+                        dto.setEspecialidad(especialidadMapper.toDTO(medico.getEspecialidad()));
+                    }
+
+                    // Mapear consultorio (SINGULAR)
+                    if (medico.getConsultorio() != null) {
+                        dto.setConsultorio(consultorioMapper.toDTO(medico.getConsultorio()));
+                    }
+
+                    return dto;
+                });
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.centromedico.sistema_turnos.controller.web;
 
 import com.centromedico.sistema_turnos.dtos.MedicoDTO;
+import com.centromedico.sistema_turnos.dtos.MedicoDetalleDTO;
 import com.centromedico.sistema_turnos.service.interfaces.MedicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class MedicoController {
 
     @GetMapping("/{id}")
     public String verMedico(@PathVariable Long id, Model model) {
-        MedicoDTO medico = medicoService.buscarPorId(id)
+        MedicoDetalleDTO medico = medicoService.buscarDetallePorId(id)
                 .orElseThrow(() -> new RuntimeException("Médico no encontrado"));
         model.addAttribute("medico", medico);
         model.addAttribute("titulo", "Detalle del Médico");

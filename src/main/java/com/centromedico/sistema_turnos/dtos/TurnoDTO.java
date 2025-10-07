@@ -19,22 +19,26 @@ public class TurnoDTO {
     private String observaciones;
     private boolean activo;
 
-    // Datos básicos del médico (sin cargar entidad completa)
+    // Datos del médico
     private Long medicoId;
     private String medicoNombre;
     private String medicoApellido;
 
-    // Datos básicos del paciente (sin cargar entidad completa)
+    // Datos del paciente
     private Long pacienteId;
     private String pacienteNombre;
     private String pacienteApellido;
 
+    // NUEVO - Especialidad y consultorio
+    private String especialidadNombre;
+    private String consultorioNumero;
+
     // Métodos helper
     public String getMedicoNombreCompleto() {
-        return medicoNombre + " " + medicoApellido;
+        return medicoApellido + ", " + medicoNombre;
     }
 
     public String getPacienteNombreCompleto() {
-        return pacienteNombre + " " + pacienteApellido;
+        return pacienteApellido + ", " + pacienteNombre;
     }
 }

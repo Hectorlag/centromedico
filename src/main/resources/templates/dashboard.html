@@ -270,12 +270,12 @@
                             <div th:unless="${#lists.isEmpty(listaTurnosEspera)}">
                                 <div th:each="turno : ${listaTurnosEspera}" class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <div>
-                                        <strong th:text="${turno.paciente.nombre}">Paciente</strong>
-                                        <small class="d-block text-muted" th:text="${turno.especialidad?.nombre}">Especialidad</small>
+                                        <strong th:text="${turno.pacienteNombreCompleto}">Paciente</strong>
+                                        <small class="d-block text-muted" th:text="${turno.especialidadNombre}">Especialidad</small>
                                     </div>
                                     <div class="text-end">
-                                        <span class="badge bg-warning" th:text="${turno.hora}">09:00</span>
-                                        <small class="d-block text-muted" th:text="${turno.medico?.nombre}">Dr. García</small>
+                                        <span class="badge bg-warning" th:text="${turno.horaInicio}">09:00</span>
+                                        <small class="d-block text-muted" th:text="${turno.medicoNombreCompleto}">Dr. García</small>
                                     </div>
                                 </div>
                             </div>
@@ -351,15 +351,19 @@
                             <div th:each="turno : ${listaTurnosAtendiendo}" class="col-md-6 col-lg-4 mb-3">
                                 <div class="card border-success">
                                     <div class="card-body">
-                                        <h6 class="card-title" th:text="${turno.paciente.nombre}">Paciente</h6>
+                                        <h6 class="card-title" th:text="${turno.pacienteNombreCompleto}">Paciente</h6>
                                         <p class="card-text">
                                             <small class="text-muted">
                                                 <i class="fas fa-user-md me-1"></i>
-                                                <span th:text="${turno.medico.nombre}">Dr. García</span>
+                                                <span th:text="${turno.medicoNombreCompleto}">Dr. García</span>
+                                            </small><br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-stethoscope me-1"></i>
+                                                <span th:text="${turno.especialidadNombre}">Especialidad</span>
                                             </small><br>
                                             <small class="text-muted">
                                                 <i class="fas fa-clock me-1"></i>
-                                                <span th:text="${turno.hora}">10:30</span>
+                                                <span th:text="${turno.horaInicio}">10:30</span>
                                             </small>
                                         </p>
                                         <span class="badge bg-success">Atendiendo</span>

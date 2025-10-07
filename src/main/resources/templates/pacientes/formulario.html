@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Formulario Paciente</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 text-primary">
+                <i class="fas fa-user-injured me-2"></i>
+                <span th:text="${titulo}">Formulario Paciente</span>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/pacientes}">Pacientes</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${accion == 'crear' ? 'Nuevo' : 'Editar'}">Nuevo</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Datos del Paciente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="${accion == 'crear' ? '/pacientes/nuevo' : '/pacientes/' + paciente.id + '/editar'}"
+                          th:object="${paciente}"
+                          method="post">
+
+                        <!-- DNI -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="dni" class="form-label">
+                                    DNI <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{dni}"
+                                       th:classappend="${#fields.hasErrors('dni')} ? 'is-invalid' : ''"
+                                       id="dni"
+                                       placeholder="Ej: 12345678"
+                                       maxlength="8"
+                                       required>
+                                <div th:if="${#fields.hasErrors('dni')}" class="invalid-feedback">
+                                    <span th:errors="*{dni}">Error en DNI</span>
+                                </div>
+                                <small class="form-text text-muted">7 u 8 dígitos sin puntos</small>
+                            </div>
+                        </div>
+
+                        <!-- Nombre y Apellido -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label">
+                                    Nombre <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{nombre}"
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                                       id="nombre"
+                                       placeholder="Ingrese el nombre"
+                                       required>
+                                <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                    <span th:errors="*{nombre}">Error en nombre</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="apellido" class="form-label">
+                                    Apellido <span class="text-danger">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{apellido}"
+                                       th:classappend="${#fields.hasErrors('apellido')} ? 'is-invalid' : ''"
+                                       id="apellido"
+                                       placeholder="Ingrese el apellido"
+                                       required>
+                                <div th:if="${#fields.hasErrors('apellido')}" class="invalid-feedback">
+                                    <span th:errors="*{apellido}">Error en apellido</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Teléfono y Email -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{telefono}"
+                                       th:classappend="${#fields.hasErrors('telefono')} ? 'is-invalid' : ''"
+                                       id="telefono"
+                                       placeholder="Ej: 1234567890">
+                                <div th:if="${#fields.hasErrors('telefono')}" class="invalid-feedback">
+                                    <span th:errors="*{telefono}">Error en teléfono</span>
+                                </div>
+                                <small class="form-text text-muted">10 a 15 dígitos sin espacios</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email"
+                                       class="form-control"
+                                       th:field="*{email}"
+                                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                       id="email"
+                                       placeholder="ejemplo@email.com">
+                                <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback">
+                                    <span th:errors="*{email}">Error en email</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Obra Social -->
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="obraSocial" class="form-label">Obra Social</label>
+                                <input type="text"
+                                       class="form-control"
+                                       th:field="*{obraSocial}"
+                                       th:classappend="${#fields.hasErrors('obraSocial')} ? 'is-invalid' : ''"
+                                       id="obraSocial"
+                                       placeholder="Ej: OSDE, Swiss Medical, IOMA"
+                                       maxlength="100">
+                                <div th:if="${#fields.hasErrors('obraSocial')}" class="invalid-feedback">
+                                    <span th:errors="*{obraSocial}">Error en obra social</span>
+                                </div>
+                                <small class="form-text text-muted">Opcional - Máximo 100 caracteres</small>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/pacientes}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${accion == 'crear' ? 'Crear Paciente' : 'Guardar Cambios'}">Guardar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <i class="fas fa-lightbulb me-2"></i>Información
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
+                        <li>El DNI debe ser único en el sistema</li>
+                        <li>El teléfono, email y obra social son opcionales</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Validación de solo números en DNI
+    document.getElementById('dni').addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+
+    // Validación de solo números en teléfono
+    document.getElementById('telefono').addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
+</body>
+</html>

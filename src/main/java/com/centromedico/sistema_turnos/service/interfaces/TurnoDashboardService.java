@@ -23,4 +23,10 @@ public interface TurnoDashboardService {
     //Cuenta total de turnos del día
 
     long contarTurnosDelDia();
+
+    /**
+     * Obtiene turnos para mostrar en el turnero (TV)
+     * Incluye turnos ATENDIENDO y últimos FINALIZADOS
+     */
+    List<TurnoDTO> listarParaTurnero();
 }

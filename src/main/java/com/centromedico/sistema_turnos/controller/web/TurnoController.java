@@ -5,6 +5,7 @@ import com.centromedico.sistema_turnos.dtos.TurnoDTO;
 import com.centromedico.sistema_turnos.mappers.TurnoMapper;
 import com.centromedico.sistema_turnos.service.interfaces.MedicoService;
 import com.centromedico.sistema_turnos.service.interfaces.PacienteService;
+import com.centromedico.sistema_turnos.service.interfaces.TurnoDashboardService;
 import com.centromedico.sistema_turnos.service.interfaces.TurnoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class TurnoController {
     private final MedicoService medicoService;
     private final PacienteService pacienteService;
     private final TurnoMapper turnoMapper;
+    private final TurnoDashboardService turnoDashboardService;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -171,6 +173,17 @@ public class TurnoController {
         turnoService.eliminarTurno(id);
         redirectAttributes.addFlashAttribute("success", "Turno eliminado exitosamente");
         return "redirect:/turnos/lista";
+    }
+
+    /**
+     * Vista de turnero para TV
+     * GET /turnos/turnero
+     */
+    @GetMapping("/turnero")
+    public String turnero(Model model) {
+        log.debug("Mostrando vista de turnero para TV");
+        model.addAttribute("turnos", turnoDashboardService.listarParaTurnero());
+        return "turnos/turnero";
     }
 
 

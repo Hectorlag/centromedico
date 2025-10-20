@@ -1,6 +1,7 @@
 package com.centromedico.sistema_turnos.dtos;
 
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class CrearTurnoDto {
     private Long medicoId;
 
     @NotNull(message = "La fecha es obligatoria")
-    @Future(message = "La fecha debe ser futura")
+    @FutureOrPresent(message = "La fecha debe ser futura")
     private LocalDate fecha;
 
     @NotNull(message = "La hora es obligatoria")

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Formulario Turno</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 text-primary">
+                <i class="fas fa-calendar-plus me-2"></i>
+                <span th:text="${titulo}">Formulario Turno</span>
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/turnos/lista}">Turnos</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" th:text="${accion == 'crear' ? 'Nuevo' : 'Editar'}">Nuevo</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Datos del Turno
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="${accion == 'crear' ? '/turnos/nuevo' : '/turnos/' + turnoId + '/editar'}"
+                          th:object="${turno}"
+                          method="post">
+
+                        <!-- Paciente y Médico -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="pacienteId" class="form-label">
+                                    <i class="fas fa-user me-2 text-info"></i>
+                                    Paciente <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select"
+                                        th:field="*{pacienteId}"
+                                        th:classappend="${#fields.hasErrors('pacienteId')} ? 'is-invalid' : ''"
+                                        id="pacienteId"
+                                        required>
+                                    <option value="">Seleccione un paciente</option>
+                                    <option th:each="paciente : ${pacientes}"
+                                            th:value="${paciente.id}"
+                                            th:text="${paciente.apellido + ', ' + paciente.nombre + ' - DNI: ' + paciente.dni}">
+                                    </option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('pacienteId')}" class="invalid-feedback">
+                                    <span th:errors="*{pacienteId}">Error en paciente</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="medicoId" class="form-label">
+                                    <i class="fas fa-user-md me-2 text-success"></i>
+                                    Médico <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select"
+                                        th:field="*{medicoId}"
+                                        th:classappend="${#fields.hasErrors('medicoId')} ? 'is-invalid' : ''"
+                                        id="medicoId"
+                                        required>
+                                    <option value="">Seleccione un médico</option>
+                                    <option th:each="medico : ${medicos}"
+                                            th:value="${medico.id}"
+                                            th:text="${'Dr./Dra. ' + medico.apellido + ', ' + medico.nombre + ' - ' + (medico.especialidadNombre ?: 'Sin especialidad')}">
+                                    </option>
+                                </select>
+                                <div th:if="${#fields.hasErrors('medicoId')}" class="invalid-feedback">
+                                    <span th:errors="*{medicoId}">Error en médico</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fecha y Hora -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="fecha" class="form-label">
+                                    <i class="fas fa-calendar me-2 text-primary"></i>
+                                    Fecha <span class="text-danger">*</span>
+                                </label>
+                                <input type="date"
+                                       class="form-control"
+                                       th:field="*{fecha}"
+                                       th:classappend="${#fields.hasErrors('fecha')} ? 'is-invalid' : ''"
+                                       id="fecha"
+                                       required>
+                                <div th:if="${#fields.hasErrors('fecha')}" class="invalid-feedback">
+                                    <span th:errors="*{fecha}">Error en fecha</span>
+                                </div>
+                                <small class="form-text text-muted">La fecha debe ser futura</small>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="horaProgramada" class="form-label">
+                                    <i class="fas fa-clock me-2 text-warning"></i>
+                                    Hora <span class="text-danger">*</span>
+                                </label>
+                                <input type="time"
+                                       class="form-control"
+                                       th:field="*{horaProgramada}"
+                                       th:classappend="${#fields.hasErrors('horaProgramada')} ? 'is-invalid' : ''"
+                                       id="horaProgramada"
+                                       required>
+                                <div th:if="${#fields.hasErrors('horaProgramada')}" class="invalid-feedback">
+                                    <span th:errors="*{horaProgramada}">Error en hora</span>
+                                </div>
+                                <small class="form-text text-muted">Formato 24 horas (Ej: 14:30)</small>
+                            </div>
+                        </div>
+
+                        <!-- Información adicional -->
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Importante:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>El sistema verificará que no exista otro turno en el mismo horario para el médico seleccionado</li>
+                                <li>El turno se creará en estado "ESPERANDO"</li>
+                                <li>Solo se pueden programar turnos para fechas futuras</li>
+                            </ul>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/turnos/lista}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                <span th:text="${accion == 'crear' ? 'Crear Turno' : 'Guardar Cambios'}">Guardar</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Ayuda -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        <i class="fas fa-lightbulb me-2"></i>Ayuda
+                    </h6>
+                    <ul class="mb-0">
+                        <li>Los campos marcados con <span class="text-danger">*</span> son obligatorios</li>
+                        <li>El paciente y médico deben estar activos en el sistema</li>
+                        <li>Revise el horario del médico antes de asignar el turno</li>
+                        <li>Los turnos se programan en intervalos según la especialidad</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Establecer fecha mínima como hoy
+    document.getElementById('fecha').setAttribute('min', new Date().toISOString().split('T')[0]);
+
+    // Auto-cerrar alerts
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+</script>
+
+</body>
+</html>

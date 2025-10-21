@@ -31,6 +31,7 @@ public class TurnoServiceImpl implements TurnoService {
     private final MedicoService medicoService;
     private final PacienteService pacienteService;
     private final TurnoMapper turnoMapper;
+    private final WebSocketNotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -101,6 +102,7 @@ public class TurnoServiceImpl implements TurnoService {
         Turno turnoGuardado = turnoRepository.save(turno);
         log.info("Turno creado exitosamente con ID: {}", turnoGuardado.getId());
 
+        notificationService.notificarTurnoCreado(turnoGuardado.getId()); //websocket
         return turnoMapper.toDTO(turnoGuardado);
     }
 
@@ -149,6 +151,7 @@ public class TurnoServiceImpl implements TurnoService {
         Turno turnoActualizado = turnoRepository.save(turnoExistente);
         log.info("Turno actualizado exitosamente: {}", id);
 
+        notificationService.notificarTurnoActualizado(turnoActualizado.getId()); //websockets
         return turnoMapper.toDTO(turnoActualizado);
     }
 
@@ -170,6 +173,9 @@ public class TurnoServiceImpl implements TurnoService {
 
         turnoRepository.save(turno);
         log.info("Turno eliminado (desactivado): {}", id);
+
+        notificationService.notificarTurnoEliminado(id); //websocket
+        notificationService.notificarTurnoEliminado(id); //websocket
     }
 
     @Override

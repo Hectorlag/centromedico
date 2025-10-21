@@ -26,16 +26,13 @@
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             margin-bottom: 30px;
-            text-align: center;
         }
 
         .header h1 {
             color: #2c5282;
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 700;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            margin-bottom: 0.25rem;
         }
 
         .turnos-table {
@@ -127,14 +124,13 @@
 
 <div class="turnero-container">
     <!-- Header -->
-    <!-- Header Mejorado -->
     <div class="header">
         <div class="row align-items-center">
             <div class="col-md-8">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-hospital-alt me-4" style="font-size: 4rem; color: #3182ce;"></i>
                     <div>
-                        <h1 style="margin-bottom: 0.25rem; font-size: 3rem;">TURNERO</h1>
+                        <h1>TURNERO</h1>
                         <p style="margin: 0; font-size: 1.5rem; color: #718096; font-weight: 500;">
                             Centro Médico
                         </p>
@@ -148,6 +144,12 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Tabla de Turnos -->
+    <div th:if="${#lists.isEmpty(turnos)}" class="empty-state">
+        <i class="fas fa-calendar-check"></i>
+        <p>No hay turnos en este momento</p>
     </div>
 
     <div th:unless="${#lists.isEmpty(turnos)}" class="turnos-table">
@@ -176,16 +178,14 @@
     </div>
 </div>
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Auto-refresh cada 10 segundos
-    setInterval(function() {
-        window.location.reload();
-    }, 10000);
-</script>
+<!-- SockJS y STOMP para WebSocket -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <script>
-    // Actualizar fecha y hora en tiempo real
+    // ===== FECHA Y HORA EN TIEMPO REAL =====
     function actualizarFechaHora() {
         const ahora = new Date();
 
@@ -205,10 +205,51 @@
     actualizarFechaHora();
     setInterval(actualizarFechaHora, 1000);
 
-    // Auto-refresh cada 10 segundos
+    // ===== WEBSOCKET =====
+    let stompClient = null;
+
+    // Conectar al WebSocket
+    function connect() {
+        const socket = new SockJS('/ws-turnos');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function(frame) {
+            console.log('✅ Conectado al WebSocket: ' + frame);
+
+            // Suscribirse al topic de turnos
+            stompClient.subscribe('/topic/turnos', function(notification) {
+                const data = JSON.parse(notification.body);
+                console.log('🔔 Notificación recibida:', data);
+
+                // Recargar la página cuando hay cambios
+                window.location.reload();
+            });
+        }, function(error) {
+            console.error('❌ Error de conexión WebSocket:', error);
+            // Reintentar conexión después de 5 segundos
+            setTimeout(connect, 5000);
+        });
+    }
+
+    // Desconectar
+    function disconnect() {
+        if (stompClient !== null) {
+            stompClient.disconnect();
+        }
+        console.log('Desconectado del WebSocket');
+    }
+
+    // Conectar al cargar la página
+    connect();
+
+    // Desconectar al cerrar la página
+    window.addEventListener('beforeunload', disconnect);
+
+    // Auto-refresh de respaldo cada 30 segundos (por si falla WebSocket)
     setInterval(function() {
+        console.log('⏰ Refresh automático de respaldo');
         window.location.reload();
-    }, 10000);
+    }, 30000);
 </script>
 
 </body>
